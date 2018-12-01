@@ -16,12 +16,12 @@ namespace CmsShop.Areas.Admin.Controllers
             // deklaracja listy PageVM
             List<PageVM> pagesList;
 
-      
+
 
             using (Db db = new Db())
             {
                 // inicializacja listy
-                pagesList = db.Pages.ToArray().OrderBy(x=>x.Sorting).Select(x=> new PageVM(x)).ToList();
+                pagesList = db.Pages.ToArray().OrderBy(x => x.Sorting).Select(x => new PageVM(x)).ToList();
             }
 
             //zwracamy strony do widoku 
@@ -38,8 +38,8 @@ namespace CmsShop.Areas.Admin.Controllers
         public ActionResult AddPage(PageVM model)
         {
             // Sprawdzanie model state
-            
-            if(!ModelState.IsValid)
+
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -49,16 +49,16 @@ namespace CmsShop.Areas.Admin.Controllers
                 string slug;
                 // Inicializacja PageDTO
                 PageDTO dto = new PageDTO();
-            
+
 
                 //Gdy adres strony nie jest wypełniony to jest przypisywany tytuł 
-                if (string.IsNullOrWhiteSpace(model.Slug))      
+                if (string.IsNullOrWhiteSpace(model.Slug))
                     slug = model.Title.Replace(" ", "-").ToLower();
                 else
                     slug = model.Slug.Replace(" ", "-").ToLower();
 
                 //zapobiegamy dodaniu takiej samej nazwy strony 
-                if (db.Pages.Any(x=>x.Title==model.Title)|| db.Pages.Any(x => x.Slug == slug))
+                if (db.Pages.Any(x => x.Title == model.Title) || db.Pages.Any(x => x.Slug == slug))
                 {
                     ModelState.AddModelError("", "Ten tytuł lub adres strony już istnieje.");
                     return View(model);
@@ -95,16 +95,68 @@ namespace CmsShop.Areas.Admin.Controllers
                 // pobieramy strone z bazy danych o przekazanym id
                 PageDTO dto = db.Pages.Find(id);
                 // sprawdzamy czy taka strona istnieje
-                if(dto==null)
+                if (dto == null)
                 {
                     return Content("Strona nie istnieje");
                 }
-                model=new PageVM(dto);
+                model = new PageVM(dto);
             }
 
 
             return View(model);
         }
+        // POST: Admin/Pages/EditPage
+        [HttpPost]
+        public ActionResult EditPage(PageVM model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            using (Db db = new Db())
+            {
+                //Pobranie id strony 
+                int id = model.Id;
+                string  slug="home";
 
+                //pobranie strony do edycji
+
+                PageDTO dto = db.Pages.Find(id);
+           
+                if(model.Slug!="home")
+                {
+                    if(string.IsNullOrWhiteSpace(model.Slug))
+                    {
+                        slug = model.Title.Replace(" ", "-").ToLower();
+                    }
+                    else
+                    {
+                        slug = model.Slug.Replace(" ", "-").ToLower();
+                    }
+                }
+                // sprawdzenie unikalność strony i adresu
+                if(db.Pages.Where(x=>x.Id!=id).Any(x=>x.Title==model.Title)||
+                    db.Pages.Where(x=>x.Id !=id).Any(x=>x.Slug==slug))
+                {
+                    ModelState.AddModelError("", "Strona lub asres strony już istnieje.");
+                }
+                // modifikacja DTO
+                dto.Title = model.Title;
+                dto.Slug = slug;
+                dto.HasSidebar = model.HasSidebar;
+                dto.Body = model.Body;
+
+                //zapis do bazy danych
+                db.SaveChanges();
+
+            }
+            //komunikat
+            TempData["SM"] = "Wyedytowałeś stronę";
+
+            //Redirect
+            return RedirectToAction("EditPage");
+
+          
+        }
     }
 }
