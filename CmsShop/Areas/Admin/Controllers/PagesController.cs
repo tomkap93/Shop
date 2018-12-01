@@ -11,6 +11,7 @@ namespace CmsShop.Areas.Admin.Controllers
     public class PagesController : Controller
     {
         // GET: Admin/Pages
+        [HttpGet]
         public ActionResult Index()
         {
             // deklaracja listy PageVM
@@ -193,6 +194,26 @@ namespace CmsShop.Areas.Admin.Controllers
                 db.SaveChanges();
             }
             return RedirectToAction("Index");
+        }
+        // POST: Admin/Pages/EditPage/id
+        [HttpPost]
+        public ActionResult ReorderPages(int[] id)
+        {
+            using (Db db= new Db())
+            {
+                int count = 1;
+                PageDTO dto;
+                //sortowanie stron zapis na bazie
+                foreach (var pageId in id)
+                {
+                    dto = db.Pages.Find(pageId);
+                    dto.Sorting = count;
+                    db.SaveChanges();
+                    count++;
+                }
+
+            }
+            return View();
         }
     }
 }
