@@ -105,7 +105,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View(model);
         }
-        // POST: Admin/Pages/EditPage
+        // POST: Admin/Pages/EditPage/id
         [HttpPost]
         public ActionResult EditPage(PageVM model)
         {
@@ -158,7 +158,8 @@ namespace CmsShop.Areas.Admin.Controllers
 
 
         }
-
+        // GET: Admin/Pages/Details/id
+        [HttpGet]
         public ActionResult Details(int id)
         {
             //deklaracja PageVM
@@ -177,6 +178,21 @@ namespace CmsShop.Areas.Admin.Controllers
             }
 
             return View(model);
+        }
+
+        // GET: Admin/Pages/Delete/id
+        [HttpGet]
+        public ActionResult Delete(int id )
+        {
+            using (Db db = new Db())
+            {
+                //pobieranie strony do usuniecia
+                PageDTO dto = db.Pages.Find(id);
+                // wybranej usuwanie strony z bazy
+                db.Pages.Remove(dto);
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
         }
     }
 }
