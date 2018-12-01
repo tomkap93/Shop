@@ -109,7 +109,7 @@ namespace CmsShop.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult EditPage(PageVM model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -117,15 +117,15 @@ namespace CmsShop.Areas.Admin.Controllers
             {
                 //Pobranie id strony 
                 int id = model.Id;
-                string  slug="home";
+                string slug = "home";
 
                 //pobranie strony do edycji
 
                 PageDTO dto = db.Pages.Find(id);
-           
-                if(model.Slug!="home")
+
+                if (model.Slug != "home")
                 {
-                    if(string.IsNullOrWhiteSpace(model.Slug))
+                    if (string.IsNullOrWhiteSpace(model.Slug))
                     {
                         slug = model.Title.Replace(" ", "-").ToLower();
                     }
@@ -135,8 +135,8 @@ namespace CmsShop.Areas.Admin.Controllers
                     }
                 }
                 // sprawdzenie unikalność strony i adresu
-                if(db.Pages.Where(x=>x.Id!=id).Any(x=>x.Title==model.Title)||
-                    db.Pages.Where(x=>x.Id !=id).Any(x=>x.Slug==slug))
+                if (db.Pages.Where(x => x.Id != id).Any(x => x.Title == model.Title) ||
+                    db.Pages.Where(x => x.Id != id).Any(x => x.Slug == slug))
                 {
                     ModelState.AddModelError("", "Strona lub asres strony już istnieje.");
                 }
@@ -156,7 +156,27 @@ namespace CmsShop.Areas.Admin.Controllers
             //Redirect
             return RedirectToAction("EditPage");
 
-          
+
+        }
+
+        public ActionResult Details(int id)
+        {
+            //deklaracja PageVM
+            PageVM model;
+            using (Db db=new Db())
+            {
+                //Pobranie strony o id 
+                PageDTO dto = db.Pages.Find(id);
+                if(dto == null)
+                {
+                    return Content("Strona o podanym id nie istnieje");
+                }
+                // inicjalizacja PageVM 
+                model = new PageVM(dto);
+
+            }
+
+            return View(model);
         }
     }
 }
