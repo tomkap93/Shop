@@ -165,11 +165,11 @@ namespace CmsShop.Areas.Admin.Controllers
         {
             //deklaracja PageVM
             PageVM model;
-            using (Db db=new Db())
+            using (Db db = new Db())
             {
                 //Pobranie strony o id 
                 PageDTO dto = db.Pages.Find(id);
-                if(dto == null)
+                if (dto == null)
                 {
                     return Content("Strona o podanym id nie istnieje");
                 }
@@ -183,7 +183,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
         // GET: Admin/Pages/Delete/id
         [HttpGet]
-        public ActionResult Delete(int id )
+        public ActionResult Delete(int id)
         {
             using (Db db = new Db())
             {
@@ -199,7 +199,7 @@ namespace CmsShop.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult ReorderPages(int[] id)
         {
-            using (Db db= new Db())
+            using (Db db = new Db())
             {
                 int count = 1;
                 PageDTO dto;
@@ -215,5 +215,40 @@ namespace CmsShop.Areas.Admin.Controllers
             }
             return View();
         }
+
+        // GET: Admin/Pages/EditSidebar
+        [HttpGet]
+        public ActionResult EditSidebar()
+        {
+            //Dekleracja Sidebar
+            SidebarVM model;
+            using (Db db = new Db())
+            {
+                //pobiramy SlidebarDTO
+                SidebarDTO dto = db.Sidebar.Find(1);
+
+                // inicializacja modelu
+                model = new SidebarVM(dto);
+
+            }
+            return View(model);
+        }
+        // POST: Admin/Pages/EditSidebar
+        [HttpPost]
+        public ActionResult EditSidebar(SidebarVM model)
+        {
+            //Dekleracja Sidebar
+
+            using (Db db = new Db())
+            {//pobiramy SlidebarDTO z bazy 
+                SidebarDTO dto = db.Sidebar.Find(1);
+                dto.Body = model.Body;
+                db.SaveChanges();
+            }
+            TempData["SM"] = "Zmodyfikowałeś Pasek Boczny.";
+
+            /// przekierowanie 
+            return RedirectToAction("EditSidebar");
+        }
     }
-}
+    }
