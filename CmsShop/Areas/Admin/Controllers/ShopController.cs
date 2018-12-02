@@ -26,5 +26,11 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View(categoryVMList);
         }
+        // POST: Admin/Shop/Categories/AddNewCategory
+        [HttpPost]
+        public ActionResult AddNewCategory()
+        {
+            return View();
+        }
     }
 }
