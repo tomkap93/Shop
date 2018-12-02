@@ -40,7 +40,7 @@
         {
             <tr id="id_@item.Id">
                 <td>
-
+                    <div class="ajaxdivtd"></div>
                     @Html.EditorFor(modelItem => item.Name,
                    new { htmlAttributes=new { @class="form-control",@readonly="readonly"} })
                 </td>
@@ -118,7 +118,7 @@
                             var toAppend = $("table#pages tbody tr:last").clone();
                             toAppend.attr("id", "id_" + data)
                             toAppend.find("#item_Name").val(catName);
-                            toAppend.find("a.delete").attr("href","/admin/shop/DeleteCategory/"+data)
+                            toAppend.find("a.delete").attr("href", "/admin/shop/DeleteCategory/" + data)
                             table.append(toAppend);
                             table.sortable("refresh");
 
@@ -128,19 +128,19 @@
                 })
 
             })
-        
+
             ////////////////////////////////////
 
 
-              /*
-             *Sortowanie kategorii
-             * 
-     
-             * 
-             * 
-             */
+            /*
+           *Sortowanie kategorii
+           * 
+   
+           * 
+           * 
+           */
 
-                 $("table#pages tbody").sortable({
+            $("table#pages tbody").sortable({
                 items: "tr:not(.home)",
                 placeholder: "ui-state-highlight",
                 update: function () {
@@ -153,17 +153,74 @@
             });
 
             ///////////////////////////////////
-              /*    
-               * Usuwanie kategorii
-               */
+            /*    
+             * Usuwanie kategorii
+             */
             $("body").on("click", "a.delete", function () {
                 if (!confirm("Potwierdzasz usunięcia kategorii")) return false;
 
             });
 
             ///////////////////////////////////
-       
-        })
+
+            /*    
+      * Edycja kategori czyli zmiana nazwy 
+      */
+
+            var orginalTextBoxValue;
+
+            $("table#pages input.text-box").dblclick(function () {
+
+                orginalTextBoxValue = $(this).val();
+                $(this).attr("readonly", false);
+            });
+
+            $("table#pages input.text-box").keyup(function (e) {
+                if (e.keyCode == 13) {
+                    @(this).blur();
+
+                }
+            });
+
+            $("table#pages input.text-box").blur(function () {
+                var $this = $(this);
+                var ajaxdiv = $this.parent().find(".ajaxdivtd");
+                var newCatName = $this.val();
+                var id = $this.parent().parent().attr("id").substring(3);
+                var url = "Admin/Shop/RenameCategory"
+
+                if (newCatName.length < 2) {
+                    alert("Nazwa kategori musi mięc minimum dwa zanki");
+                    $.this.attr("readonly", true);
+                    return false;
+                }
+
+                $.post(url, { newCatName: newCatName, id: id }, function (data) {
+                    var responce = date.trim();
+                    if (responce == "tytulzajety") {
+                        $this.val(orginalTextBoxValue);
+                        ajaxdiv.html("<span class='alert alert-denger'>Ta nazwa kategorii jest już zajęta!!</span>").show();
+                    }
+                    else {
+                        ajaxdiv.html("<span class='alert alert-success'>Nazwa kategori została zmieniona</span>").show();
+                    }
+
+                    setTimeout(function () {
+                        ajaxdiv.fadeOut("fast", function () {
+                            ajaxdiv.html("");
+                        });
+                    }, 2000);
+
+                }).done(function () {
+                    $this.attr("readonly", true);
+                });
+
+
+            });
+
+            ///////////////////////////////////
+
+        });
 
     </script>
 
