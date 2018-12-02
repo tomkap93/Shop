@@ -21,13 +21,13 @@
 @if (!Model.Any())
 {
     <h1 class="text-center">Nie ma żadnych kategorii.</h1>
-}
-else
-{
+    }
+    else
+    {
 
 
-    <table class="table">
-        <tr>
+    <table class="table sorting categories" id="pages">
+        <tr class="home">
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
@@ -38,7 +38,7 @@ else
 
         @foreach (var item in Model)
         {
-            <tr>
+            <tr id="id_@item.Id">
                 <td>
 
                     @Html.EditorFor(modelItem => item.Name,
@@ -85,11 +85,11 @@ else
 
                 if (catName.length < 2) {
                     alert("Nazwa kategorii musieć co najmniej 2 znaki!");
-                    return false;
+                    return false
                 }
                 ajaxText.show();
 
-                var url = "/Admin/Shop/AddNewCategory"
+                var url = "/admin/shop/AddNewCategory"
                 $.post(url, { catName: catName }, function (data) {
 
                     var response = data.trim();
@@ -128,23 +128,47 @@ else
                 })
 
             })
-     
+        
             ////////////////////////////////////
 
 
               /*
-             *
+             *Sortowanie kategorii
+             * 
+     
+             * 
+             * 
              */
 
+                 $("table#pages tbody").sortable({
+                items: "tr:not(.home)",
+                placeholder: "ui-state-highlight",
+                update: function () {
+                    var ids = $("table#pages tbody").sortable("serialize");
+                    var url = "/Admin/Shop/ReorderCategories";
 
+                    $.post(url, ids, function (data) {
+                    });
+                }
+            });
 
             ///////////////////////////////////
+              /*    
+               * Usuwanie kategorii
+               */
+            $("body").on("click", "a.delete", function () {
+                if (!confirm("Potwierdzasz usunięcia kategorii")) return false;
+
+            });
+
+            ///////////////////////////////////
+       
         })
 
     </script>
 
+    }
 
-}
 
 
 
