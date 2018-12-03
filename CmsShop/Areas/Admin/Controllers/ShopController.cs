@@ -2,6 +2,7 @@
 using CmsShop.Models.ViewModels.Shop;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 
 namespace CmsShop.Areas.Admin.Controllers
@@ -36,7 +37,7 @@ namespace CmsShop.Areas.Admin.Controllers
             using (Db db = new Db())
             {
                 // czy kategoria jest unikalna
-                if (db.Categories.Any(x=>x.Name==catName))
+                if (db.Categories.Any(x => x.Name == catName))
                     return "tytulzajety";
 
                 // inicjalizacja DTO
@@ -89,7 +90,7 @@ namespace CmsShop.Areas.Admin.Controllers
         [HttpGet]
         public ActionResult DeleteCategory(int id)
         {
-            using (Db db= new Db())
+            using (Db db = new Db())
             {
                 // pobieramy kategorie do usuniecia
                 CategoryDTO dto = db.Categories.Find(id);
@@ -102,12 +103,12 @@ namespace CmsShop.Areas.Admin.Controllers
         }
         // POST: Admin/Shop/RenameCategory
         [HttpPost]
-        public string RenameCategory(string newCatName,int id )
+        public string RenameCategory(string newCatName, int id)
         {
             using (Db db = new Db())
             {
                 // sprawdzenie czy kategoria jest unikalna
-                if(db.Categories.Any(x => x.Name == newCatName))
+                if (db.Categories.Any(x => x.Name == newCatName))
                     return "tytulzajety";
 
                 // edycja kategorii
@@ -124,7 +125,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
 
 
-               
+
             return "ok";
         }
 
@@ -145,7 +146,59 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View(model);
         }
+        //POST: Admin/Shop/AddProduct
+        [HttpPost]
+        public ActionResult AddProduct(ProductVM model,HttpPostedFileBase file)
+        {
+            // sprawdzenie modelu state
+            if(!ModelState.IsValid)
+            {
+                using (Db db = new Db())
+                {
+                    model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+                    return View(model);
+                }
+             
+            }
+            // spradzenie czy nazwa produktu jest unialna
 
+            using (Db db = new Db())
+            {
+                if (db.Products.Any(x=>x.Name==model.Name))
+                {
+                    ModelState.AddModelError("","ta nazwa produktu jest zajęta");
+                    model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+                    return View(model);
+                }
+            }
+            // deklaracja product id
+            int id;
+            // dodawanie produktu i zapis na bazie 
+            using (Db db = new Db())
+            {
+                ProductDTO product = new ProductDTO();
+                product.Name = model.Name;
+                product.Slug = model.Name.Replace(" ", "-").ToLower();
+                product.Description = model.Description;
+                product.Price = model.Price;
+                product.CategoryId = model.CategoryId;
 
+                CategoryDTO catDto = db.Categories.FirstOrDefault(x => x.Id == model.CategoryId);
+                product.CategoryName = catDto.Name;
+
+                db.Products.Add(product);
+                db.SaveChanges();
+
+                // pobranie id  dodanego productu 
+                id = product.Id;
+
+            }
+            // ustawiamy komunikat ze product został dodany 
+            TempData["SM"] = "DOdałeś produkt";
+            #region Upload Image
+
+            #endregion
+            return View();
+        }
     }
 }
