@@ -1,22 +1,19 @@
 ﻿@model CmsShop.Models.ViewModels.Shop.ProductVM
-
 @{
     ViewBag.Title = "Dodaj Produkt";
 }
-
 <h2>Dodaj Produkt</h2>
-
 @if (TempData["SM"] != null)
 {
-    <div class="alert alert-success"> @TempData["SM"]</div>
+    <div class="alert alert-success">
+        @TempData["SM"]
+    </div>
 }
-
-@using (Html.BeginForm("AddProduct", "Shop", FormMethod.Post, new { enctype = "miltipart/form-data" }))
+@using (Html.BeginForm("AddProduct", "Shop", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -26,9 +23,6 @@
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>
         </div>
-
-
-
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -36,7 +30,6 @@
                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
-
         <div class="form-group">
             @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -44,68 +37,58 @@
                 @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
             </div>
         </div>
-
-
-
         <div class="form-group">
-            <label class="control-label col-md-2">Kategorie</label>
+            <label class="control-label col-md-2">Kategoria</label>
             <div class="col-md-10">
                 @Html.DropDownListFor(model => model.CategoryId, Model.Categories, "Wybierz Kategorie", new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
             </div>
         </div>
-
         <div class="form-group">
             <label class="control-label col-md-2">Zdjecie</label>
             <div class="col-md-10">
-                <input type="file" name="file" id="Imageupload" />
+                <input type="file" name="file" id="ImageUpload" />
                 <img id="imgpreview" src="#" />
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Dodaj product" class="btn btn-default" />
+                <input type="submit" value="Dodaj Produkt" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
-
 <div>
-    @Html.ActionLink("Powrót do listy produktów", "Products")
+    @Html.ActionLink("Powrót do Listy Produktów", "Products")
 </div>
 
-@section scripts{
-
-
-
-
+@section scripts {
     <script>
 
         $(function () {
 
+            /*
+            * Wysietlanie podgladu obrazka
+            */
 
-            /// kod odpowiedzalny za wyswietlanie podgladu obrazka
             function readURL(input) {
+
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
+
                     reader.onload = function (e) {
                         $("img#imgpreview").attr("src", e.target.result).width(200).height(200);
                     }
+
                     reader.readAsDataURL(input.files[0]);
                 }
             }
 
-            $("#Imageupload").change(function () {
+            $("#ImageUpload").change(function () {
                 readURL(this);
-            });
-
+            })
         });
 
     </script>
-
-
-
-
-
 }
