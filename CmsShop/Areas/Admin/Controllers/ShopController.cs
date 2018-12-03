@@ -26,7 +26,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View(categoryVMList);
         }
-        // POST: Admin/Shop/Categories/AddNewCategory
+        // POST: Admin/Shop/AddNewCategory
         [HttpPost]
         public string AddNewCategory(string catName)
         {
@@ -57,7 +57,7 @@ namespace CmsShop.Areas.Admin.Controllers
         }
 
 
-        // POST: Admin/Shop/Categories/ReorderCategories
+        // POST: Admin/Shop/ReorderCategories
         [HttpPost]
         public ActionResult ReorderCategories(int[] id)
 
@@ -85,7 +85,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View();
         }
-        //GET: Admin/Shop/Categories/ReorderCategories
+        //GET: Admin/Shop/ReorderCategories
         [HttpGet]
         public ActionResult DeleteCategory(int id)
         {
@@ -100,7 +100,7 @@ namespace CmsShop.Areas.Admin.Controllers
             }
             return RedirectToAction("Categories");
         }
-        // POST: Admin/Shop/Categories/RenameCategory
+        // POST: Admin/Shop/RenameCategory
         [HttpPost]
         public string RenameCategory(string newCatName,int id )
         {
@@ -127,6 +127,25 @@ namespace CmsShop.Areas.Admin.Controllers
                
             return "ok";
         }
+
+
+        //GET: Admin/Shop/AddProduct
+        [HttpGet]
+        public ActionResult AddProduct()
+        {
+            // inicjalizacja modelu
+            ProductVM model = new ProductVM();
+            // pobieramy liste kategorii
+            using (Db db = new Db())
+            {
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+
+            }
+
+
+            return View(model);
+        }
+
 
     }
 }
