@@ -58,7 +58,7 @@
             </td>
             <td>
                 @Html.ActionLink("Edycja", "EditProduct", new { id = product.Id }) |
-                @Html.ActionLink("Usuń", "DeleteProduct", new { id = product.Id })
+                @Html.ActionLink("Usuń", "DeleteProduct", new { id = product.Id }, new { @class = "delete" })
             </td>
         </tr>
     }
@@ -71,6 +71,7 @@
 
         /*
         * filtrowanie do wybranej kategorii
+        * 3
         */
 
         $("#SelectCategory").on("change", function () {
@@ -84,9 +85,13 @@
         })
 
         //////////////////////////////////////////////////////////////////
+        // potwierdznie usuniecia strony 
+        $(function () {
+        $("a.delete").click(function () {
+            if (!confirm("Potwierdzasz usunięcie produktu?")) return false;
+        });
 
-
-
+});
                 //////////////////////////////////////////////////////////////////
 
     </script>
