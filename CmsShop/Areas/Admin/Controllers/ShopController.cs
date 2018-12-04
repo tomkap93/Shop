@@ -328,8 +328,71 @@ namespace CmsShop.Areas.Admin.Controllers
             return View(model);
         }
 
+        //Post: Admin/Shop/EditProduct
+        [HttpPost]
+        public ActionResult EditProduct(ProductVM model, HttpPostedFileBase file)
+        {
+
+            ///pobranie id productu
+            int id = model.Id;
+
+            //pobranie kategori i dla listy rozwijanej
+            using (Db db= new Db())
+            {
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+            }
+            //ustawiamy zdjecia
+            model.GalleryImages= Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
+                    .Select(fn => Path.GetFileName(fn));
+            //sprawdzamy model state
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // sprawdzenie unikalośći nazwy produktu 
+
+            using (Db db= new Db())
+            {
+                if (db.Products.Where(x=>x.Id!=id).Any(x=>x.Name==model.Name))
+                {
+                    ModelState.AddModelError("", "Ta nazwa produktu jest zajęta");
+                    return View(model);
+                }
+            }
+
+            //Edycja productu , zapis na bazie 
+
+            using (Db db= new Db())
+            {
+                ProductDTO dto = db.Products.Find(id);
+
+                dto.Name = model.Name;
+                dto.Slug = model.Name.Replace(" ", "-").ToLower();
+                dto.Price = model.Price;
+                dto.Description = model.Description;
+                dto.CategoryId = model.CategoryId;
+                dto.ImageName = model.ImageName;
+                CategoryDTO catDto = db.Categories.FirstOrDefault(x => x.Id == model.CategoryId);
+                dto.CategoryName = catDto.Name;
+
+                db.SaveChanges();
 
 
+            }
+            // ustawienie tempdata
+            TempData["SM"] = "Edytowałes product";
+
+            #region Image UpLoad
+
+
+
+            #endregion
+
+
+
+            return RedirectToAction("EditProduct");
+        }
 
     }
 }
