@@ -75,10 +75,31 @@
         </div>
     </div>
 }
+<hr />
+@if (!Model.GalleryImages.Any())
+{
+    <h3>Brak galerii zdjęć dla tego productu</h3>
+}
+<form action="/admin/shop/SaveGalleryImages" method="post" enctype="multipart/form-data" class="dropzone" id="dropzoneForm">
+    <div class="fallback">
+        <input type="file" name="file" multiple />
+        <input type="submit" value="Upload" />
+    </div>
 
-
+</form>
+<br /><br />
+@foreach (var image in Model.GalleryImages)
+{
+    <div style="display: inline-block">
+        <img src="/Images/Upload/Products/@Model.Id/Gallery/Thumbs/@image" />
+        @Html.ActionLink("Usuń", "DeleteImage", "Shop", new { @class = "deleteimage", data_name = image })
+    </div>
+}
+<link href="~/Scripts/dropzone/basic.css" rel="stylesheet" />
+<link href="~/Scripts/dropzone/dropzone.css" rel="stylesheet" />
 
 @section scripts {
+    <script src="~/Scripts/dropzone/dropzone.js"></script>
     <script>
 
         $(function () {
@@ -103,8 +124,26 @@
             $("#ImageUpload").change(function () {
                 readURL(this);
             })
+        /////////////////////////////////////////////////
+            // drop zone js
+
+            Dropzone.options.dropzoneForm = {
+                acceptedFiles: "image/*",
+                init: function () {
+                    this.on("complete", function (file) {
+                        if (this.getUploadingFils().length === 0 && this.getQueuedFiles().length === 0) {
+                            Location.reload();
+                        }
+                    });
+                    this.on("sending", function (file, xhr, formData) {
+                        formData.append("id",@Model.Id)
+                    });
+                }
+
+            };
 
 
+        ////////////////////////////////////////////////////
         });
 
     </script>
