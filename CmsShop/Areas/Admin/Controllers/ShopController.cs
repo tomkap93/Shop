@@ -295,7 +295,40 @@ namespace CmsShop.Areas.Admin.Controllers
             //zwracamy widok z listą produktów
             return View(listOfProductVM);
         }
-         
+        //GET: Admin/Shop/EditProduct
+        [HttpGet]
+        public ActionResult EditProduct(int id)
+        {
+            // deklaracja productVM
+
+            ProductVM model;
+
+            using (Db db = new Db())
+            {
+                ProductDTO dto = db.Products.Find(id);
+                // sprawdzenie czy produkct istnieje 
+
+                if (dto==null)
+                {
+                    return Content("Ten product nie istnieje");
+
+                }
+                // inicjalizacja modelu 
+                model = new ProductVM(dto);
+
+                // lista katgori 
+                model.Categories = new SelectList(db.Categories.ToList(),"Id","Name");
+                // ustawiamy zdjecia
+                model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
+                    .Select(fn => Path.GetFileName(fn));
+
+            }
+
+
+            return View(model);
+        }
+
+
 
 
     }
