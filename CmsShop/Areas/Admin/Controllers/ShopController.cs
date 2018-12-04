@@ -151,25 +151,25 @@ namespace CmsShop.Areas.Admin.Controllers
         }
         //POST: Admin/Shop/AddProduct
         [HttpPost]
-        public ActionResult AddProduct(ProductVM model,HttpPostedFileBase file)
+        public ActionResult AddProduct(ProductVM model, HttpPostedFileBase file)
         {
             // sprawdzenie modelu state
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 using (Db db = new Db())
                 {
                     model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
                     return View(model);
                 }
-             
+
             }
             // spradzenie czy nazwa produktu jest unialna
 
             using (Db db = new Db())
             {
-                if (db.Products.Any(x=>x.Name==model.Name))
+                if (db.Products.Any(x => x.Name == model.Name))
                 {
-                    ModelState.AddModelError("","ta nazwa produktu jest zajęta");
+                    ModelState.AddModelError("", "ta nazwa produktu jest zajęta");
                     model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
                     return View(model);
                 }
@@ -200,14 +200,14 @@ namespace CmsShop.Areas.Admin.Controllers
             TempData["SM"] = "Dodałeś produkt";
             #region Upload Image
             // utworzenie potrzebnej struktury katalogów 
-            var orginalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads",Server.MapPath(@"\")));
+            var orginalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
 
             var pathString1 = Path.Combine(orginalDirectory.ToString(), "Products");
-            var pathString2 = Path.Combine(orginalDirectory.ToString(), "Products\\"+id.ToString());
-            var pathString3 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString()+ "\\Thumbs");
+            var pathString2 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString());
+            var pathString3 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");
             var pathString4 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery");
             var pathString5 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery\\Thumbs");
-            if(!Directory.Exists(pathString1))
+            if (!Directory.Exists(pathString1))
                 Directory.CreateDirectory(pathString1);
             if (!Directory.Exists(pathString2))
                 Directory.CreateDirectory(pathString2);
@@ -218,18 +218,18 @@ namespace CmsShop.Areas.Admin.Controllers
             if (!Directory.Exists(pathString5))
                 Directory.CreateDirectory(pathString5);
 
-            if ( file!=null && file.ContentLength>0)
+            if (file != null && file.ContentLength > 0)
             {
                 // sprawdzenie rozszerzenia pliku czy mamy do czynienia z obraziem 
                 string ext = file.ContentType.ToLower();
-                if(ext!= "image/jpg"&&
+                if (ext != "image/jpg" &&
                    ext != "image/jpeg" &&
                    ext != "image/png" &&
                    ext != "image/pjpg" &&
                    ext != "image/gif" &&
                    ext != "image/x-png")
                 {
-                       using (Db db = new Db())
+                    using (Db db = new Db())
                     {
                         model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
                         ModelState.AddModelError("", "Obrazek nie został przesłany - nie prawidłowe rozszerzenie obrazu ");
@@ -248,7 +248,7 @@ namespace CmsShop.Areas.Admin.Controllers
                     db.SaveChanges();
                 }
 
-                var path = string.Format("{0}\\{1}",pathString2,imageName);
+                var path = string.Format("{0}\\{1}", pathString2, imageName);
                 var path2 = string.Format("{0}\\{1}", pathString3, imageName);
                 // zapis orginalny obrazek 
                 file.SaveAs(path);
@@ -268,20 +268,20 @@ namespace CmsShop.Areas.Admin.Controllers
 
         //GET: Admin/Shop/Products
         [HttpGet]
-        public ActionResult  Products(int? page, int? catId)
+        public ActionResult Products(int? page, int? catId)
         {
             // Deklaracja listy Produktów
             List<ProductVM> listOfProductVM;
 
             // ustawiamy nr strony 
             var pageNumber = page ?? 1;
-            using (Db db= new Db())
+            using (Db db = new Db())
             {
-              
+
                 // inicjalizacja listy produktów    
                 listOfProductVM = db.Products.ToArray()
                                     .Where(x => catId == null || catId == 0 || x.CategoryId == catId)
-                                    .Select(x=> new ProductVM(x))
+                                    .Select(x => new ProductVM(x))
                                     .ToList();
                 // lista kategori do dropDownList
                 ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
@@ -308,7 +308,7 @@ namespace CmsShop.Areas.Admin.Controllers
                 ProductDTO dto = db.Products.Find(id);
                 // sprawdzenie czy produkct istnieje 
 
-                if (dto==null)
+                if (dto == null)
                 {
                     return Content("Ten product nie istnieje");
 
@@ -317,7 +317,7 @@ namespace CmsShop.Areas.Admin.Controllers
                 model = new ProductVM(dto);
 
                 // lista katgori 
-                model.Categories = new SelectList(db.Categories.ToList(),"Id","Name");
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
                 // ustawiamy zdjecia
                 model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
                     .Select(fn => Path.GetFileName(fn));
@@ -337,12 +337,12 @@ namespace CmsShop.Areas.Admin.Controllers
             int id = model.Id;
 
             //pobranie kategori i dla listy rozwijanej
-            using (Db db= new Db())
+            using (Db db = new Db())
             {
                 model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
             }
             //ustawiamy zdjecia
-            model.GalleryImages= Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
+            model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
                     .Select(fn => Path.GetFileName(fn));
             //sprawdzamy model state
             if (!ModelState.IsValid)
@@ -352,9 +352,9 @@ namespace CmsShop.Areas.Admin.Controllers
 
             // sprawdzenie unikalośći nazwy produktu 
 
-            using (Db db= new Db())
+            using (Db db = new Db())
             {
-                if (db.Products.Where(x=>x.Id!=id).Any(x=>x.Name==model.Name))
+                if (db.Products.Where(x => x.Id != id).Any(x => x.Name == model.Name))
                 {
                     ModelState.AddModelError("", "Ta nazwa produktu jest zajęta");
                     return View(model);
@@ -363,7 +363,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
             //Edycja productu , zapis na bazie 
 
-            using (Db db= new Db())
+            using (Db db = new Db())
             {
                 ProductDTO dto = db.Products.Find(id);
 
@@ -385,22 +385,22 @@ namespace CmsShop.Areas.Admin.Controllers
 
             #region Image UpLoad
             // sprawdzenie czy plik jest i ca ma jakies dane 
-            if(file!= null&& file.ContentLength>0)
+            if (file != null && file.ContentLength > 0)
             {
                 // sprawdzenie rozszerzenia pliku 
                 string ext = file.ContentType.ToLower();
                 if (ext != "image/jpg" &&
-                    ext !="image/jpeg"&&
+                    ext != "image/jpeg" &&
                     ext != "image/pjpeg" &&
                     ext != "image/gif" &&
                     ext != "image/png" &&
                     ext != "image/x-png"
                     )
                 {
-                    using (Db db= new Db())
+                    using (Db db = new Db())
                     {
                         model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
-                        ModelState.AddModelError("","Obraz został przesłany - nie prawdłowe rozszerzenie obrazu.");
+                        ModelState.AddModelError("", "Obraz został przesłany - nie prawdłowe rozszerzenie obrazu.");
                         return View(model);
                     }
 
@@ -410,8 +410,8 @@ namespace CmsShop.Areas.Admin.Controllers
 
                 var orginalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
 
-        
-                var pathString1= Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString());
+
+                var pathString1 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString());
                 var pathString2 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");
 
                 //usuwamy start pliki z katalogów
@@ -428,7 +428,7 @@ namespace CmsShop.Areas.Admin.Controllers
                 string imageName = file.FileName;
                 using (Db db = new Db())
                 {
-                    ProductDTO dto= db.Products.Find(id);
+                    ProductDTO dto = db.Products.Find(id);
                     dto.ImageName = imageName;
                     db.SaveChanges();
                 }
@@ -461,7 +461,7 @@ namespace CmsShop.Areas.Admin.Controllers
         {
             // sniecie prodkt z bazy 
 
-            using (Db db=new Db())
+            using (Db db = new Db())
             {
                 ProductDTO dto = db.Products.Find(id);
                 db.Products.Remove(dto);
@@ -472,11 +472,44 @@ namespace CmsShop.Areas.Admin.Controllers
             var orginalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
             var pathString = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString());
 
-            if(Directory.Exists(pathString))
-                Directory.Delete(pathString,true);
-            
+            if (Directory.Exists(pathString))
+                Directory.Delete(pathString, true);
+
 
             return RedirectToAction("Products");
         }
+
+        //Post: Admin/Shop/SaveGalleryImages/id
+        [HttpPost]
+        public ActionResult SaveGalleryImages(int id)
+        {
+            //pętla po obrazkach 
+            foreach (string FileName in Request.Files)
+            {
+                HttpPostedFileBase file = Request.Files[FileName];
+                // sprawdzenie czy mamy plik i czy nie jest pusty
+                if (file != null && file.ContentLength>0)
+                {
+                    //Utowrzenie potrzebnej struktury katalogów
+                    var orginalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+                    string pathString1 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery");
+                    string pathString2 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery\\Thumbs");
+
+                    var path1 = string.Format("{0}\\{1}", pathString1, file.FileName);
+                    var path2 = string.Format("{0}\\{1}", pathString2, file.FileName);
+
+                    // Zapis obrazków i miniaturek 
+                    file.SaveAs(path1);
+
+                    WebImage img = new WebImage(file.InputStream);
+                    img.Resize(200, 200); // zmiana rozmiaru
+                    img.Save(path2);
+
+                }
+            }
+            return View();
+        }
+
+        
     }
 }
