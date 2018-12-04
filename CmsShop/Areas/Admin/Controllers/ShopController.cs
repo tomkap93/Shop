@@ -384,8 +384,70 @@ namespace CmsShop.Areas.Admin.Controllers
             TempData["SM"] = "Edytowałes product";
 
             #region Image UpLoad
+            // sprawdzenie czy plik jest i ca ma jakies dane 
+            if(file!= null&& file.ContentLength>0)
+            {
+                // sprawdzenie rozszerzenia pliku 
+                string ext = file.ContentType.ToLower();
+                if (ext != "image/jpg" &&
+                    ext !="image/jpeg"&&
+                    ext != "image/pjpeg" &&
+                    ext != "image/gif" &&
+                    ext != "image/png" &&
+                    ext != "image/x-png"
+                    )
+                {
+                    using (Db db= new Db())
+                    {
+                        model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+                        ModelState.AddModelError("","Obraz został przesłany - nie prawdłowe rozszerzenie obrazu.");
+                        return View(model);
+                    }
+
+                }
+                //  utworenie potrebnej struktury katalogów
 
 
+                var orginalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+
+        
+                var pathString1= Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString());
+                var pathString2 = Path.Combine(orginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");
+
+                //usuwamy start pliki z katalogów
+                DirectoryInfo di1 = new DirectoryInfo(pathString1);
+                DirectoryInfo di2 = new DirectoryInfo(pathString2);
+
+                foreach (var file2 in di1.GetFiles())
+                    file2.Delete();
+
+                foreach (var file3 in di2.GetFiles())
+                    file3.Delete();
+
+                // zapis nazwe obrazka na bazie 
+                string imageName = file.FileName;
+                using (Db db = new Db())
+                {
+                    ProductDTO dto= db.Products.Find(id);
+                    dto.ImageName = imageName;
+                    db.SaveChanges();
+                }
+
+
+
+                // zapis nowych plików do katalogów
+
+                var path = string.Format("{0}\\{1}", pathString1, imageName);
+                var path2 = string.Format("{0}\\{1}", pathString2, imageName);
+                // zapis orginalny obrazek 
+                file.SaveAs(path);
+
+                //zapisujemy miniaturke i zmieniamy rozmiar zdjęcia 
+                WebImage img = new WebImage(file.InputStream);
+                img.Resize(200, 200);
+                img.Save(path2);
+
+            }
 
             #endregion
 
