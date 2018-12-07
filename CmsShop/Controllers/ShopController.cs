@@ -31,5 +31,39 @@ namespace CmsShop.Controllers
             // zwramy partial z lista 
             return PartialView(categoryVMList);
         }
+
+        public ActionResult Category(string name)
+        {
+            // deklaracia productVMList
+            List<ProductVM> productVMList;
+            // pobranie z bazy produktów
+
+            using (Db db = new Db())
+            {
+                // pobranie id categorui
+                CategoryDTO categoryDTO = db.Categories
+                    .Where(x => x.Slug == name)
+                    .FirstOrDefault();
+                int catId = categoryDTO.Id;
+                // inicjalizcja produktow
+                productVMList = db.Products
+                    .ToArray()
+                    .Where(x => x.CategoryId == catId)
+                    .Select(x => new ProductVM(x))
+                    .ToList();
+
+
+                // pobieramy nazwe categori 
+                 //  var productCat = db.Products.Where(x => x.CategoryId == catId).FirstOrDefault();
+               // ViewBag.CategoryName = productCat.CategoryName;
+               // zmieniłem ponieważ jeżeli nie ma kategoria produktów wyrzuca expetion null point reference
+                ViewBag.CategoryName = categoryDTO.Name;
+
+            }
+            //zwracamy widok z listą produktów z danej kategorii 
+            return View(productVMList);
+        }
+
+
     }
 }
