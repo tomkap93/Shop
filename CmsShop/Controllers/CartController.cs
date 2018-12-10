@@ -1,5 +1,7 @@
-﻿using CmsShop.Models.ViewModels.Cart;
+﻿using CmsShop.Models.Data;
+using CmsShop.Models.ViewModels.Cart;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace CmsShop.Controllers
@@ -10,7 +12,7 @@ namespace CmsShop.Controllers
         public ActionResult Index()
         {
             var cart = Session["cart"] as List<CartVM> ?? new List<CartVM>();
-            if (cart.Count==0||Session["cart"]==null)
+            if (cart.Count == 0 || Session["cart"] == null)
             {
                 ViewBag.Message = "Twój koszyk jest pusty";
                 return View();
@@ -36,7 +38,7 @@ namespace CmsShop.Controllers
             decimal price = 0M;
 
             //sprawdzamy czy mamy dane koszyka zapisane w sesi
-            if (Session["cart"]!=null)
+            if (Session["cart"] != null)
             {
                 //pobieranie wartości z sesji 
                 var list = (List<CartVM>)Session["cart"];
@@ -44,7 +46,7 @@ namespace CmsShop.Controllers
                 foreach (var item in list)
                 {
                     qty += item.Quantity;
-                    price += item.Quantity*item.Price;
+                    price += item.Quantity * item.Price;
                 }
             }
             else
@@ -57,5 +59,58 @@ namespace CmsShop.Controllers
 
             return PartialView(model);
         }
+
+
+        public ActionResult AddToCartPartial(int id)
+        {
+            // Inicjalizacja CArt VM List
+            List<CartVM> cart = Session["cart"] as List<CartVM> ?? new List<CartVM>();
+
+            //inicjalizacja CartVM
+            CartVM model = new CartVM();
+
+            using (Db db = new Db())
+            {
+                // pobieramy product
+                ProductDTO product = db.Products.Find(id);
+                // sprawdzamy cz ten product jst już w koszyku
+                var productInCart = cart.FirstOrDefault(x => x.ProductId == id);
+                // w zależnośći od tego czy product jest w koszyku bedziemy wykonywać różne opcje 
+                if (productInCart == null)
+                {
+                    cart.Add(new CartVM()
+                    {
+                        ProductId = product.Id,
+                        ProductName = product.Name,
+                        Quantity = 1,
+                        Price = product.Price,
+                        Image = product.ImageName
+
+
+                    });
+                }
+                else
+                {
+                    productInCart.Quantity++;
+                }
+            }
+            // pobieramy wartości ilości i ceny i dodajemy do modelu 
+            int qty = 0;
+            decimal price = 0m;
+
+            foreach (var item in cart)
+            {
+                qty += item.Quantity;
+                price += item.Price * item.Quantity;
+            }
+            model.Quantity = qty;
+            model.Price = price;
+            // zapisać w sesji
+            Session["cart"] = cart;
+
+
+            return PartialView(model);
+        }
+
     }
 }
