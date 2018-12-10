@@ -130,21 +130,23 @@ namespace CmsShop.Controllers
             return Json(result,JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult DecrproductProduct(int productId)
+        public JsonResult DecrementProduct(int productId)
         {
             // inicjalizacja listy cartVM 
             List<CartVM> cart = Session["cart"] as List<CartVM>;
 
             // pobieramy cartVM
             CartVM model = cart.FirstOrDefault(x => x.ProductId == productId);
-            if (model.Quantity==1)
+            
+            if (model.Quantity > 1)
             {
-                cart.Remove(model);
+         
                 model.Quantity--;
             }
             else
             {
-                model.Quantity--;
+                cart.Remove(model);
+                model.Quantity = 0;
             }
     
 
