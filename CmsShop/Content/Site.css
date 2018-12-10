@@ -29,3 +29,7 @@ span.ajaxmsg {
     bottom:0;
     position:absolute;
 }
+.ajaxcart{
+    position: relative;
+    top:5px;
+}
