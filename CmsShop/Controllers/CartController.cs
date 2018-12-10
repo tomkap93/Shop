@@ -114,5 +114,46 @@ namespace CmsShop.Controllers
             return PartialView(model);
         }
 
+        public JsonResult IncrementProduct(int productId)
+        {
+            // inicjalizacja listy cartVM 
+            List<CartVM> cart = Session["cart"]as List<CartVM>;
+
+            // pobieramy cartVM
+            CartVM model = cart.FirstOrDefault(x => x.ProductId == productId);
+            model.Quantity++;
+
+            // przygotowanie danych do JSONa
+
+            var result = new { qty = model.Quantity, price = model.Price };
+
+            return Json(result,JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DecrproductProduct(int productId)
+        {
+            // inicjalizacja listy cartVM 
+            List<CartVM> cart = Session["cart"] as List<CartVM>;
+
+            // pobieramy cartVM
+            CartVM model = cart.FirstOrDefault(x => x.ProductId == productId);
+            if (model.Quantity==1)
+            {
+                cart.Remove(model);
+                model.Quantity--;
+            }
+            else
+            {
+                model.Quantity--;
+            }
+    
+
+            // przygotowanie danych do JSONa
+
+            var result = new { qty = model.Quantity, price = model.Price };
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
