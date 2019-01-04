@@ -11,13 +11,27 @@ namespace CmsShop.Controllers
         // GET: Account
         public ActionResult Index()
         {
-            return View();
+            return Redirect("~/account/login");
         }
-        //GET:/account/create-account
+        // GET: /account/create-account
         [ActionName("create-account")]
-        public ActionResult CreatAccount()
+        [HttpGet]
+        public ActionResult CreateAccount()
         {
+
             return View("CreateAccount");
         }
+        //GET:/account/login
+        public ActionResult Login()
+
+        {         // sprawdzanie czy uzytkownik nie jest juz zalogowany
+            string userName = User.Identity.Name;
+            if (!string.IsNullOrEmpty(userName))
+                return RedirectToAction("user-profile");
+
+            // zwracamy widok
+            return View();
+        }
+
     }
 }
