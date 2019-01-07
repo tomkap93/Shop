@@ -30,22 +30,49 @@
                     {
                         if (ViewBag.Title == "Logowanie")
                         {
-                            <li>  <a href="/account/login" >Logowanie</a> </li>
+                            <li>  <a href="/account/login">Logowanie</a> </li>
                         }
                         else
                         {
-                            <li> <a href="/account/login" >Logowanie</a></li>
+                            <li> <a href="/account/login">Logowanie</a></li>
                         }
 
                     }
-                    @if (Request.IsAuthenticated)
+                    @if (Request.IsAuthenticated && User.IsInRole("User")) // sprawdzanie roli użytkownika  odnośnik w globl
                     {
-                        <li>@Html.Action("UserNavPartial", "Account", new { area = "" })</li>
+
+                        if (ViewBag.Title == "Profil użytkownika")
+                        {
+                            <li class="active">@Html.Action("UserNavPartial", "Account", new { area = "" })</li>
+                        }
+                        else
+                        {
+                            <li>@Html.Action("UserNavPartial", "Account", new { area = "" })</li>
+                        }
+
+
                     }
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    @Html.Action("CartPartial", "Cart")
-                </ul>
+
+                @if (Request.IsAuthenticated && User.IsInRole("Admin")) // sprawdzanie roli użytkownika  odnośnik w globl
+                {
+                    <ul class="navbar-collapse collapse navbar-right adminarea">
+
+                        <li>  @Html.ActionLink("Dashboard", "Index", "Dashboard", new { area = "Admin" }, null)</li>
+                    </ul>
+
+                }
+                else
+                {
+                    if (ViewBag.Title != "Koszyk Szczegóły")
+                    {
+                        <ul class="nav navbar-nav navbar-right">
+                            @Html.Action("CartPartial", "Cart")
+                        </ul>
+                    }
+                }
+
+
             </div>
         </div>
     </div>

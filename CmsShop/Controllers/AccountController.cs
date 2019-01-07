@@ -232,7 +232,7 @@ namespace CmsShop.Controllers
                 dto.LastName = model.LastName;
                 dto.EmailAddress = model.EmailAddress;
                 dto.UserName = model.UserName;
-                if (string.IsNullOrWhiteSpace(model.Password))
+                if (!string.IsNullOrWhiteSpace(model.Password))
                 {
                     dto.Password = model.Password;
                 }
