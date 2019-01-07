@@ -192,119 +192,114 @@ namespace CmsShop.Controllers
             return View("UserProfile", model);
         }
 
-        // POST: /account/user-profile
-        //[HttpPost]
-        //[ActionName("user-profile")]
+       // POST: /account/user-profile
+       [HttpPost]
+       [ActionName("user-profile")]
 
-        //public ActionResult UserProfile(UserProfileVM model)
-        //{
-        //    // sprawdzenie model state
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return View("UserProfile", model);
-        //    }
+        public ActionResult UserProfile(UserProfileVM model)
+        {
+            // sprawdzenie model state 
+            if (!ModelState.IsValid)
+            {
+                return View("UserProfile",model);
+            }
+            // sprawdzay hasła
+            if (!string.IsNullOrWhiteSpace(model.Password))
+            {
+                if (!model.Password.Equals(model.ConfirmPassword))
+                {
+                    ModelState.AddModelError("","Hasła nie są zgodne");
+                    return View("UserProfile", model);
+                }
+            }
 
-        //    // sprawdzamy hasła
-        //    if (!string.IsNullOrWhiteSpace(model.Password))
-        //    {
-        //        if (!model.Password.Equals(model.ConfirmPassword))
-        //        {
-        //            ModelState.AddModelError("", "Hasła nie pasują do siebie.");
-        //            return View("UserProfile", model);
-        //        }
-        //    }
+            using (Db db = new Db())
+            {
+                // Pobieramy nazwe użytkownika
+                string userName = User.Identity.Name;
 
-        //    using (Db db = new Db())
-        //    {
-        //        // pobieramy nazwe uzytkownika
-        //        string username = User.Identity.Name;
+                // sprawdzenie czy nazwa użytkownika jest unikalna
+                if (db.Users.Where(x=>x.Id!=model.Id).Any(x=>x.UserName==userName))
+                {
+                    ModelState.AddModelError("", "Nazwa użytkownika "+ model.UserName + " zajęta");
+                    model.UserName = "";
+                    return View("UserProfile", model);
+                }
+                // edycj dto
+                UserDTO dto = db.Users.Find(model.Id);
 
-        //        // sprawdzenie czy nazwa uzytkownika jest unikalna
-        //        if (db.Users.Where(x => x.Id != model.Id).Any(x => x.UserName == username))
-        //        {
-        //            ModelState.AddModelError("", "Nazwa użytkownika " + model.UserName + " zajęta");
-        //            model.UserName = "";
-        //            return View("UserProfile", model);
-        //        }
+                dto.FirstName = model.FirstName;
+                dto.LastName = model.LastName;
+                dto.EmailAddress = model.EmailAddress;
+                dto.UserName = model.UserName;
+                if (string.IsNullOrWhiteSpace(model.Password))
+                {
+                    dto.Password = model.Password;
+                }
+                // ustawienie komunikatu zmiennej tempdata
+                
+                db.SaveChanges();
+            }
+            TempData["SM"] = " Edytowałeś swój profil";
+            return Redirect("~/account/user-profile");
+        }
 
-        //        // edycja DTO
-        //        UserDTO dto = db.Users.Find(model.Id);
-        //        dto.FirstName = model.FirstName;
-        //        dto.LastName = model.LastName;
-        //        dto.EmailAddress = model.EmailAddress;
-        //        dto.UserName = model.UserName;
+      
 
-        //        if (!string.IsNullOrWhiteSpace(model.Password))
-        //        {
-        //            dto.Password = model.Password;
-        //        }
+            //// GET: /account/Orders
+            //[Authorize(Roles = "User")]
+            //public ActionResult Orders()
+            //{
+            //    // inicjalizacja listy zamowien dla uzytkownika
+            //    List<OrdersForUserVM> ordersForUser = new List<OrdersForUserVM>();
 
-        //        // zapis
-        //        db.SaveChanges();
-        //    }
+            //    using (Db db = new Db())
+            //    {
+            //        // pobieramy id uzytkownika
+            //        UserDTO user = db.Users.Where(x => x.UserName == User.Identity.Name).FirstOrDefault();
+            //        int userId = user.Id;
 
+            //        // pobieramy zamowienia dla uzytkownika
+            //        List<OrderVM> orders = db.Orders.Where(x => x.UserId == userId).ToArray().Select(x => new OrderVM(x)).ToList();
 
-        //    // ustawienie komunikatu
-        //    TempData["SM"] = "Edytowałeś swój profil!";
+            //        foreach (var order in orders)
+            //        {
+            //            // inicjalizacja slownika produktów
+            //            Dictionary<string, int> productsAndQty = new Dictionary<string, int>();
+            //            decimal total = 0m;
 
-        //    return Redirect("~/account/user-profile");
-        //}
+            //            // pobieramy szczegoly zamowienia
+            //            List<OrderDetailsDTO> orderDetailsDTO = db.OrderDetails.Where(x => x.OrderId == order.OrderId).ToList();
 
+            //            foreach (var orderDetails in orderDetailsDTO)
+            //            {
+            //                // pobieramy produkt
+            //                ProductDTO product = db.Products.Where(x => x.Id == orderDetails.ProductId).FirstOrDefault();
 
-        //// GET: /account/Orders
-        //[Authorize(Roles = "User")]
-        //public ActionResult Orders()
-        //{
-        //    // inicjalizacja listy zamowien dla uzytkownika
-        //    List<OrdersForUserVM> ordersForUser = new List<OrdersForUserVM>();
+            //                // pobieramy cene
+            //                decimal price = product.Price;
 
-        //    using (Db db = new Db())
-        //    {
-        //        // pobieramy id uzytkownika
-        //        UserDTO user = db.Users.Where(x => x.UserName == User.Identity.Name).FirstOrDefault();
-        //        int userId = user.Id;
+            //                // pobieramy nazwe
+            //                string productName = product.Name;
 
-        //        // pobieramy zamowienia dla uzytkownika
-        //        List<OrderVM> orders = db.Orders.Where(x => x.UserId == userId).ToArray().Select(x => new OrderVM(x)).ToList();
+            //                // dodajemy produkt do slownika
+            //                productsAndQty.Add(productName, orderDetails.Quantity);
 
-        //        foreach (var order in orders)
-        //        {
-        //            // inicjalizacja slownika produktów
-        //            Dictionary<string, int> productsAndQty = new Dictionary<string, int>();
-        //            decimal total = 0m;
+            //                total += orderDetails.Quantity * price;
+            //            }
 
-        //            // pobieramy szczegoly zamowienia
-        //            List<OrderDetailsDTO> orderDetailsDTO = db.OrderDetails.Where(x => x.OrderId == order.OrderId).ToList();
+            //            ordersForUser.Add(new OrdersForUserVM()
+            //            {
+            //                OrderNumber = order.OrderId,
+            //                Total = total,
+            //                ProductsAndQty = productsAndQty,
+            //                CreatedAt = order.CreatedAt
+            //            });
+            //        }
+            //    }
 
-        //            foreach (var orderDetails in orderDetailsDTO)
-        //            {
-        //                // pobieramy produkt
-        //                ProductDTO product = db.Products.Where(x => x.Id == orderDetails.ProductId).FirstOrDefault();
+            //    return View(ordersForUser);
+            //}
 
-        //                // pobieramy cene
-        //                decimal price = product.Price;
-
-        //                // pobieramy nazwe
-        //                string productName = product.Name;
-
-        //                // dodajemy produkt do slownika
-        //                productsAndQty.Add(productName, orderDetails.Quantity);
-
-        //                total += orderDetails.Quantity * price;
-        //            }
-
-        //            ordersForUser.Add(new OrdersForUserVM()
-        //            {
-        //                OrderNumber = order.OrderId,
-        //                Total = total,
-        //                ProductsAndQty = productsAndQty,
-        //                CreatedAt = order.CreatedAt
-        //            });
-        //        }
-        //    }
-
-        //    return View(ordersForUser);
-        //}
-
-    }
+        }
 }
