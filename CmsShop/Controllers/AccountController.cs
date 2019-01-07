@@ -168,163 +168,87 @@ namespace CmsShop.Controllers
         }
 
         //[Authorize]
-        //public ActionResult UserNavPartial()
-        //{
-        //    // pobieramy username
-        //    string username = User.Identity.Name;
 
-        //    // deklarujemy model
-        //    UserNavPartialVM model;
-
-        //    using (Db db = new Db())
-        //    {
-        //        // pobieramy uzytkownika
-        //        UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == username);
-
-        //        model = new UserNavPartialVM()
-        //        {
-        //            FirstName = dto.FirstName,
-        //            LastName = dto.LastName
-        //        };
-        //    }
-
-        //    return PartialView(model);
-        //}
-
-        //[Authorize]
-        //public ActionResult UserNavPartial2()
-        //{
-        //    // Get username
-        //    string username = User.Identity.Name;
-
-        //    // Declare model
-        //    UserNavPartialVM model;
-
-        //    using (Db db = new Db())
-        //    {
-        //        // Get the user
-        //        UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == username);
-
-        //        // Build the model
-        //        model = new UserNavPartialVM()
-        //        {
-        //            FirstName = dto.FirstName,
-        //            LastName = dto.LastName
-        //        };
-        //    }
-
-        //    // Return partial view with model
-        //    return PartialView(model);
-        //}
-
-        //[Authorize]
-        //public ActionResult UserNavPartial3()
-        //{
-        //    // Get username
-        //    string username = User.Identity.Name;
-        //    string email = string.Empty;
-
-        //    // Declare model
-        //    UserNavPartialVM3 model;
-
-        //    using (Db db = new Db())
-        //    {
-        //        // Get the user
-        //        UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == username);
-
-        //        // Build the model
-        //        // Build the model
-        //        model = new UserNavPartialVM3()
-        //        {
-        //            Email = dto.EmailAddress
-        //        };
-        //    }
-
-        //    // Return partial view with model
-        //    return PartialView(model);
-        //}
-
-
-        //// GET: /account/user-profile
-        //[HttpGet]
-        //[ActionName("user-profile")]
-        //[Authorize]
-        //public ActionResult UserProfile()
-        //{
-        //    // pobieramy nazwe uzytkownika
-        //    string username = User.Identity.Name;
-
-        //    //deklarujemy model
-        //    UserProfileVM model;
-
-        //    using (Db db = new Db())
-        //    {
-        //        // pobieramy uzytkownika
-        //        UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == username);
-
-        //        model = new UserProfileVM(dto);
-        //    }
-
-        //    return View("UserProfile", model);
-        //}
-
-        // POST: /account/user-profile
-        [HttpPost]
+        // GET: /account/user-profile
+        [HttpGet]
         [ActionName("user-profile")]
-      
-        public ActionResult UserProfile(UserProfileVM model)
+        [Authorize]
+        public ActionResult UserProfile()
         {
-            // sprawdzenie model state
-            if (!ModelState.IsValid)
-            {
-                return View("UserProfile", model);
-            }
+            // pobieramy nazwe uzytkownika
+            string username = User.Identity.Name;
 
-            // sprawdzamy hasła
-            if (!string.IsNullOrWhiteSpace(model.Password))
-            {
-                if (!model.Password.Equals(model.ConfirmPassword))
-                {
-                    ModelState.AddModelError("", "Hasła nie pasują do siebie.");
-                    return View("UserProfile", model);
-                }
-            }
+            //deklarujemy model
+            UserProfileVM model;
 
             using (Db db = new Db())
             {
-                // pobieramy nazwe uzytkownika
-                string username = User.Identity.Name;
+                // pobieramy uzytkownika
+                UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == username);
 
-                // sprawdzenie czy nazwa uzytkownika jest unikalna
-                if (db.Users.Where(x => x.Id != model.Id).Any(x => x.UserName == username))
-                {
-                    ModelState.AddModelError("", "Nazwa użytkownika " + model.UserName + " zajęta");
-                    model.UserName = "";
-                    return View("UserProfile", model);
-                }
-
-                // edycja DTO
-                UserDTO dto = db.Users.Find(model.Id);
-                dto.FirstName = model.FirstName;
-                dto.LastName = model.LastName;
-                dto.EmailAddress = model.EmailAddress;
-                dto.UserName = model.UserName;
-
-                if (!string.IsNullOrWhiteSpace(model.Password))
-                {
-                    dto.Password = model.Password;
-                }
-
-                // zapis
-                db.SaveChanges();
+                model = new UserProfileVM(dto);
             }
 
-
-            // ustawienie komunikatu
-            TempData["SM"] = "Edytowałeś swój profil!";
-
-            return Redirect("~/account/user-profile");
+            return View("UserProfile", model);
         }
+
+        // POST: /account/user-profile
+        //[HttpPost]
+        //[ActionName("user-profile")]
+
+        //public ActionResult UserProfile(UserProfileVM model)
+        //{
+        //    // sprawdzenie model state
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View("UserProfile", model);
+        //    }
+
+        //    // sprawdzamy hasła
+        //    if (!string.IsNullOrWhiteSpace(model.Password))
+        //    {
+        //        if (!model.Password.Equals(model.ConfirmPassword))
+        //        {
+        //            ModelState.AddModelError("", "Hasła nie pasują do siebie.");
+        //            return View("UserProfile", model);
+        //        }
+        //    }
+
+        //    using (Db db = new Db())
+        //    {
+        //        // pobieramy nazwe uzytkownika
+        //        string username = User.Identity.Name;
+
+        //        // sprawdzenie czy nazwa uzytkownika jest unikalna
+        //        if (db.Users.Where(x => x.Id != model.Id).Any(x => x.UserName == username))
+        //        {
+        //            ModelState.AddModelError("", "Nazwa użytkownika " + model.UserName + " zajęta");
+        //            model.UserName = "";
+        //            return View("UserProfile", model);
+        //        }
+
+        //        // edycja DTO
+        //        UserDTO dto = db.Users.Find(model.Id);
+        //        dto.FirstName = model.FirstName;
+        //        dto.LastName = model.LastName;
+        //        dto.EmailAddress = model.EmailAddress;
+        //        dto.UserName = model.UserName;
+
+        //        if (!string.IsNullOrWhiteSpace(model.Password))
+        //        {
+        //            dto.Password = model.Password;
+        //        }
+
+        //        // zapis
+        //        db.SaveChanges();
+        //    }
+
+
+        //    // ustawienie komunikatu
+        //    TempData["SM"] = "Edytowałeś swój profil!";
+
+        //    return Redirect("~/account/user-profile");
+        //}
 
 
         //// GET: /account/Orders
