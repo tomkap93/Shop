@@ -5,16 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace CmsShop.Controllers
 {
     public class AccountController : Controller
     {
         // GET: Account
+        [HttpGet]
         public ActionResult Index()
         {
             return Redirect("~/account/login");
         }
+
+    
         // GET: /account/create-account
         [ActionName("create-account")]
         [HttpGet]
@@ -24,6 +28,7 @@ namespace CmsShop.Controllers
             return View("CreateAccount");
         }
         //GET:/account/login
+        [HttpGet]
         public ActionResult Login()
 
         {         // sprawdzanie czy uzytkownik nie jest juz zalogowany
@@ -33,6 +38,44 @@ namespace CmsShop.Controllers
 
             // zwracamy widok
             return View();
+        }
+
+        //POST:/account/login
+        [HttpPost]
+        public ActionResult Login(LoginUserVM model)
+        {
+            //sprawdzenie model state
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            //sprawdzamy uzytkownika
+            bool isValid = false;
+            using (Db db=new Db())
+            {
+                if (db.Users.Any(x=>x.UserName.Equals(model.UserName)&& x.Password.Equals(model.Password)))
+                {
+                    isValid = true;
+                }
+            }
+            if (!isValid)
+            {
+                ModelState.AddModelError("", "Nie prawidłowa nazwa użytkownika lub hasło");
+
+                return View(model);
+            }
+            else
+            {
+                FormsAuthentication.SetAuthCookie(model.UserName,model.RememberMe);
+                return Redirect(FormsAuthentication.GetRedirectUrl(model.UserName,model.RememberMe));
+            }          
+        }
+        //GET:/account/logout
+        [HttpGet]
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            return Redirect("~/account/login");
         }
 
         [HttpPost]
@@ -97,7 +140,7 @@ namespace CmsShop.Controllers
             return Redirect("~/account/login");
         }
 
-
+     
 
     }
 }
