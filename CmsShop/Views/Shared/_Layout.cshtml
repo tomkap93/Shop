@@ -16,7 +16,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="/" class="navbar-brand">Shop</a>
+                <a href="/" class="navbar-brand">Sklep</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -58,9 +58,9 @@
                 {         
                 if (User.IsInRole("Admin")) // sprawdzanie roli użytkownika  odnośnik w globl
                 {
-                    <ul class="navbar-collapse collapse navbar-right adminarea">
+                    <ul class="navbar-collapse collapse navbar-right adminarea navbar-brand">
 
-                        <li>  @Html.ActionLink("Dashboard", "Index", "Dashboard", new { area = "Admin" }, null)</li>
+                        <li>  @Html.ActionLink("Panel Administratora", "Index", "Dashboard", new { area = "Admin" }, null)</li>
                     </ul>
 
                 }
@@ -105,7 +105,7 @@
 
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - CMS Shop</p>
+            <p>&copy; @DateTime.Now.Year - Sklep</p>
         </footer>
     </div>
 

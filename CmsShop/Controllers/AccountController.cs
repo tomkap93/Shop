@@ -134,16 +134,15 @@ namespace CmsShop.Controllers
 
             return Redirect("~/account/login");
         }
-
+        [Authorize]
         // GET: /account/logout
-     
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
 
             return Redirect("~/account/login");
         }
-
+        [Authorize]
         public ActionResult UserNavPartial()
         {
             // pobieramy username;
@@ -167,8 +166,6 @@ namespace CmsShop.Controllers
 
             return PartialView(model);
         }
-
-        //[Authorize]
 
         // GET: /account/user-profile
         [HttpGet]
@@ -196,7 +193,6 @@ namespace CmsShop.Controllers
        // POST: /account/user-profile
        [HttpPost]
        [ActionName("user-profile")]
-
         public ActionResult UserProfile(UserProfileVM model)
         {
             // sprawdzenie model state 
@@ -245,6 +241,7 @@ namespace CmsShop.Controllers
             return Redirect("~/account/user-profile");
         }
         // GET: /account/Orders
+        [Authorize(Roles ="User")]
         public ActionResult Orders()
         {
             // inicjalizacja listy zamówien dla użytkownjika
