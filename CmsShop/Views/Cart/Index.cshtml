@@ -195,9 +195,30 @@ else
 
                 });
             });
+            
+        ///Składanie zamowienia
+
+        $("a.placeorder").click(function (e) {
+
+            e.preventDefault();
+            var $this = $(this);
+            var productId = $(this).data("id");
+            var url = "/cart/PlaceOrder";
+            $(".ajaxbg").show();
+
+            $.post(url, { }, function (data) {
+
+                $(".ajaxbg").text("Dziekuję. Zostaniesz teraz przekierowany do systemu PayPal");
+                setTimeout(function () {
+
+                    $('form input[name="submit"]').click();
+
+                }, 2000);
+
+
+            });
+        });
             ///////////////////////////////////
         });
-
-                            /////////////////////////////////
     </script>
 }

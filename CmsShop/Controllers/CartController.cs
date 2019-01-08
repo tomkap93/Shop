@@ -1,7 +1,10 @@
 ﻿using CmsShop.Models.Data;
 using CmsShop.Models.ViewModels.Cart;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Web.Mvc;
 
 namespace CmsShop.Controllers
@@ -169,13 +172,71 @@ namespace CmsShop.Controllers
            
            
         }
-
+    
         public ActionResult PayPalPartial()
         {
             List<CartVM> cart = Session["cart"] as List<CartVM>; // zapisane w sesji
 
 
             return PartialView(cart);
+        }
+
+        [HttpPost]
+        public void PlaceOrder()
+        {
+            // ppobieramy zawartosc koszyka z sesi
+            List<CartVM> cart = Session["cart"] as List<CartVM>;
+
+            // pobranie nazwy uzytkownika
+            string username = User.Identity.Name;
+
+            // deklarujemy numer zamowienia
+            int orderId = 0;
+
+            using (Db db = new Db())
+            {
+                // inicjalizacja OrderDTO
+                OrderDTO oredrDTO = new OrderDTO();
+
+                // pobieramu user id
+                var user = db.Users.FirstOrDefault(x => x.UserName == username);
+                int userId = user.Id;
+
+                // ustawienie orderDTO i zapis 
+                oredrDTO.UserId = userId;
+                oredrDTO.CreatedAt = DateTime.Now;
+
+                db.Orders.Add(oredrDTO);
+                db.SaveChanges();
+
+                // pobieramy id zapisanego zamowienia
+                orderId = oredrDTO.OrderId;
+
+                // inicjalizacja OrderDetailsDTO
+                OrderDetailsDTO orderDetailsDTO = new OrderDetailsDTO();
+
+                foreach (var item in cart)
+                {
+                    orderDetailsDTO.OrderId = orderId;
+                    orderDetailsDTO.UserId = userId;
+                    orderDetailsDTO.ProductId = item.ProductId;
+                    orderDetailsDTO.Quantity = item.Quantity;
+
+                    db.OrderDetails.Add(orderDetailsDTO);
+                    db.SaveChanges();
+                }
+            }
+
+            // wysylanie emaila do admina
+            var client = new SmtpClient("smtp.mailtrap.io", 2525)
+            {
+                Credentials = new NetworkCredential("af6b8e39b53e5a", "04bc816627feb2"),
+                EnableSsl = true
+            };
+            client.Send("admin@example.com", "admin@example.com", "Nowe zamowienie", "Masz nowe zamowienie. Numer zamówienia " + orderId);
+
+            // reset session
+            Session["cart"] = null;
         }
     }
 }

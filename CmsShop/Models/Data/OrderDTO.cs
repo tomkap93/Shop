@@ -10,7 +10,7 @@ namespace CmsShop.Models.Data
         [Key]
         public int OrderId { get; set; }
         public int UserId { get; set; }
-        public DateTime CreatedAdd { get; set; }
+        public DateTime CreatedAt { get; set; }
         [ForeignKey("UserId")]
         public virtual UserDTO Users { get; set; }
     }
