@@ -1,5 +1,6 @@
 ﻿using CmsShop.Models.Data;
 using CmsShop.Models.ViewModels.Shop;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace CmsShop.Controllers
 {
     public class ShopController : Controller
     {
+        private int productIDtoReview;
         // GET: Shop
         public ActionResult Index()
         {
@@ -90,9 +92,100 @@ namespace CmsShop.Controllers
             model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
                 .Select(fn => Path.GetFileName(fn));
             //zwracamy wdok z modelem 
+
+       
             return View("ProductDetails",model);
         }
 
+        [HttpGet]
+        public ActionResult ReviewCreate(int id)
+        {
+            ReviewVM vm = new ReviewVM();
+    
+                vm.ProductId = id;
 
+            return PartialView(vm);
+        }
+      
+        //Post: / shop/ReviewCreate
+        [HttpPost]
+        public ActionResult ReviewCreate(ReviewVM model)
+        {
+            string username = User.Identity.Name;
+            ProductVM model1;
+            if (!string.IsNullOrWhiteSpace(model.Review))
+            {
+
+                
+                using (Db db = new Db())
+                {
+                    
+
+                    var user = db.Users.FirstOrDefault(x => x.UserName == username);
+           
+                ReviewDTO reviewDTO  = new ReviewDTO();
+                    reviewDTO.ProductId = model.ProductId;
+                reviewDTO.UserId = user.Id;
+                reviewDTO.UserName = user.UserName;
+                reviewDTO.CreateAt = DateTime.Now;
+                reviewDTO.Review = model.Review;
+
+                db.Reviews.Add(reviewDTO);
+                db.SaveChanges();
+
+                    // doświerzenie widoku 
+                    ProductDTO dtoproduktu;
+                    dtoproduktu = db.Products.Where(x => x.Id == model.ProductId).FirstOrDefault();
+                    model1 = new ProductVM(dtoproduktu);
+                    model1.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + dtoproduktu.Id + "/Gallery/Thumbs"))
+                    .Select(fn => Path.GetFileName(fn));
+                }
+                return PartialView();
+                // return View("ProductDetails", model1);
+            }
+            else
+            {
+                return PartialView();
+            }
+           
+            
+        }
+        //Get: / shop/Review
+    
+        public ActionResult Review(int id)
+        {
+           
+            List<ReviewVM> listReviewVM;
+            using (Db db= new Db())
+            {
+                
+                listReviewVM = db.Reviews.ToArray().Where(x => x.ProductId == id).Select(x=>new ReviewVM(x)).ToList();
+            }
+            return PartialView(listReviewVM);
+
+            
+        }
+
+        //Get: / shop/ReviewDelete
+        public ActionResult ReviewDelete(int id,int idProduktu)
+        {
+            ProductVM model;
+            ProductDTO dtoproduktu;
+            using (Db db = new Db())
+            {
+                dtoproduktu = db.Products.Where(x => x.Id == idProduktu).FirstOrDefault();
+                model = new ProductVM(dtoproduktu);
+                // pobieramy komentarza do usuniecia
+                ReviewDTO dto = db.Reviews.Find(id);
+                // usunięcie komentarza
+                db.Reviews.Remove(dto);
+                //zapisanie zmian
+                db.SaveChanges();
+            }
+            model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + idProduktu + "/Gallery/Thumbs"))
+                    .Select(fn => Path.GetFileName(fn));
+            return View("ProductDetails",model);
+           
+        }
     }
 }

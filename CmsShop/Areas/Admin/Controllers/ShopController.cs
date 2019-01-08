@@ -1,10 +1,14 @@
 ﻿using CmsShop.Areas.Admin.Models.ViewModels.Shop;
 using CmsShop.Models.Data;
 using CmsShop.Models.ViewModels.Shop;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using PagedList;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
@@ -573,6 +577,214 @@ namespace CmsShop.Areas.Admin.Controllers
             }
 
             return View(ordersForAdminVM);
+        }
+
+        public FileResult Drukuj(int OrderNumber)
+        {
+
+            MemoryStream workStream = new MemoryStream();
+            StringBuilder status = new StringBuilder("");
+            DateTime dTime = DateTime.Now;
+            //file name to be created   
+            string strPDFFileName = string.Format("SamplePdf" + dTime.ToString("yyyyMMdd") + "-" + ".pdf");
+            iTextSharp.text.Document doc = new iTextSharp.text.Document();
+
+            doc.SetMargins(0f, 0f, 0f, 0f);
+            //Create PDF Table with 5 columns  
+            PdfPTable tableLayout = new PdfPTable(5);
+            doc.SetMargins(0f, 0f, 0f, 0f);
+            //Create PDF Table  
+
+            //file will created in this path  
+            string strAttachment = Server.MapPath("~/Downloadss/" + strPDFFileName);
+
+
+            PdfWriter.GetInstance(doc, workStream).CloseStream = false;
+            doc.Open();
+
+            //Add Content to PDF   
+            doc.Add(Add_Content_To_PDF(tableLayout, OrderNumber));
+
+            // Closing the document  
+            doc.Close();
+
+            byte[] byteInfo = workStream.ToArray();
+            workStream.Write(byteInfo, 0, byteInfo.Length);
+            workStream.Position = 0;
+
+
+            return File(workStream, "application/pdf", strPDFFileName);
+
+
+        }
+        protected PdfPTable Add_Content_To_PDF(PdfPTable tableLayout, int i)
+        {
+            DateTime dTime = DateTime.Now;
+            using (Db db = new Db())
+            {
+
+                UserDTO user = db.Users.Where(x => x.UserName == User.Identity.Name).FirstOrDefault();
+
+                float[] headers = { 50, 24, 45, 35, 50 }; //Header Widths  
+                tableLayout.SetWidths(headers); //Set the pdf headers  
+                tableLayout.WidthPercentage = 100; //Set the PDF File witdh percentage  
+                tableLayout.HeaderRows = 1;
+                //Add Title to the PDF file at the top  
+
+                List<OrderDetailsDTO> orderDetails = db.OrderDetails.Where(x => x.OrderId == i).ToList();
+                //   List<OrderDTO> employees = _context.employees.ToList<Employee>();
+
+                string strPDFFileName = string.Format("Faktura Sklep" + dTime.ToString("yyyyMMdd"));
+                tableLayout.AddCell(new PdfPCell(new Phrase("Faktura nr " + i, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 20, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_CENTER
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase(" Data " + strPDFFileName, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 15, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase(" Sprzedawca", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 15, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+
+                tableLayout.AddCell(new PdfPCell(new Phrase("Sklep UTP", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase("Adres ", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase("Nr tele ", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase("NIP ", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase("Regon ", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+
+                ////Add header  
+                AddCellToHeader(tableLayout, "Nr");
+                AddCellToHeader(tableLayout, "Product");
+                AddCellToHeader(tableLayout, "Cena");
+                AddCellToHeader(tableLayout, "Ilość");
+                AddCellToHeader(tableLayout, "Wartość");
+
+                ////Add body  
+
+                decimal suma = 0;
+
+                foreach (var item in orderDetails)
+                {
+
+                    AddCellToBody(tableLayout, item.Products.Id.ToString());
+                    AddCellToBody(tableLayout, item.Products.Name.ToString());
+                    AddCellToBody(tableLayout, item.Products.Price.ToString());
+                    AddCellToBody(tableLayout, item.Quantity.ToString());
+                    AddCellToBody(tableLayout, (item.Products.Price * item.Quantity).ToString());
+                    suma += item.Products.Price * item.Quantity;
+                }
+
+                tableLayout.AddCell(new PdfPCell(new Phrase("Suma :" + suma, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 10, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_RIGHT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase("Kupujący", new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 15, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+
+                tableLayout.AddCell(new PdfPCell(new Phrase("Nr kupującego " + user.Id, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+
+                tableLayout.AddCell(new PdfPCell(new Phrase("Imię i nazwisko :" + user.FirstName + " " + user.LastName, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase("Adres email " + user.EmailAddress, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+                tableLayout.AddCell(new PdfPCell(new Phrase("Nr tele " + user.Id, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, new iTextSharp.text.BaseColor(0, 0, 0))))
+                {
+                    Colspan = 12,
+                    Border = 0,
+                    PaddingBottom = 5,
+                    HorizontalAlignment = Element.ALIGN_LEFT
+                });
+
+            }
+
+            return tableLayout;
+        }
+        // Method to add single cell to the Header  
+        private static void AddCellToHeader(PdfPTable tableLayout, string cellText)
+        {
+
+            tableLayout.AddCell(new PdfPCell(new Phrase(cellText, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, iTextSharp.text.BaseColor.YELLOW)))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                Padding = 5,
+                BackgroundColor = new iTextSharp.text.BaseColor(128, 0, 0)
+            });
+        }
+
+        // Method to add single cell to the body  
+        private static void AddCellToBody(PdfPTable tableLayout, string cellText)
+        {
+            tableLayout.AddCell(new PdfPCell(new Phrase(cellText, new iTextSharp.text.Font(iTextSharp.text.Font.FontFamily.HELVETICA, 8, 1, iTextSharp.text.BaseColor.BLACK)))
+            {
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                Padding = 5,
+                BackgroundColor = new iTextSharp.text.BaseColor(255, 255, 255)
+            });
         }
 
     }

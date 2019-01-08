@@ -15,7 +15,7 @@
         <br />
         @Html.DisplayFor(model => model.Price)
         <br />
-        @if (Request.IsAuthenticated)
+        @if (Request.IsAuthenticated && User.IsInRole("User"))
         {
             <div class="addtocart">
                 <a href="#" class="addtocart">Dodaj do koszyka</a>
@@ -36,24 +36,51 @@
 
     <h3>Zdjecia produktu</h3>
     <div class="col-xs-12 fancyboxdiv">
-        <br /><br />
-        @foreach (var image in Model.GalleryImages)
+
+        @if (Model.GalleryImages.Count() > 0)
+        {<br /><br />
+            foreach (var image in Model.GalleryImages)
+            {
+                <div style="display: inline-block">
+                    <a class="fancybox" rel="gallery1" href="/Images/Uploads/Products/@Model.Id/Gallery/@image">
+                        <img src="/Images/Uploads/Products/@Model.Id/Gallery/Thumbs/@image" />
+                    </a>
+                </div>
+            }
+        }
+        else
         {
-            <div style="display: inline-block">
-                <a class="fancybox" rel="gallery1" href="/Images/Uploads/Products/@Model.Id/Gallery/@image">
-                    <img src="/Images/Uploads/Products/@Model.Id/Gallery/Thumbs/@image" />
-                </a>
+            <div class="col-xs-12 ">
+                <h4>Brak wiekszej ilości zdjęć</h4>
             </div>
         }
 
+
     </div>
-
+    <h3>Komentarze</h3>
+    <div class="col-xs-12 ">
+       @Html.Action("Review", "Shop",new { id = Model.Id })
+    </div>
+    <br />
+    @if (Request.IsAuthenticated && User.IsInRole("User"))
+    {
+    <div class="col-xs-12 ">
+        <h4>Nowy komentarz</h4>
+        @Html.Action("ReviewCreate", "Shop", new { id = Model.Id })
+    </div>
+    }
+    else
+    {
+        <div class="col-xs-12 ">
+            <h4>Dodawać komentarze mogą tylko zalogowani użytkownicy</h4>
+        </div>
+    }
 </div>
-<link href="~/Content/jquery.fancybox.css" rel="stylesheet" />
-@section scripts{
+    <link href="~/Content/jquery.fancybox.css" rel="stylesheet" />
+    @section scripts{
 
-    <script src="~/Scripts/jquery.fancybox.js"></script>
-    <script>
+        <script src="~/Scripts/jquery.fancybox.js"></script>
+        <script>
         $(function () {
 
             // fancybox
@@ -91,6 +118,6 @@
 
 
         });
-    </script>
+        </script>
 
-}
+    }

@@ -22,11 +22,14 @@ namespace CmsShop.Models.ViewModels.Account
         }
         public int Id { get; set; }
         [Required]
+        [Display(Name = "Imię")]
         public string FirstName { get; set; }
         [Required]
+        [Display(Name = "Nazwisko")]
         public string LastName { get; set; }
         [Required]
         [DataType(DataType.EmailAddress)]
+        [Display(Name = "Email")]
         public string EmailAddress { get; set; }
         [Required]
         public string UserName { get; set; }

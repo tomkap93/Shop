@@ -199,8 +199,8 @@ namespace CmsShop.Controllers
                 OrderDTO oredrDTO = new OrderDTO();
 
                 // pobieramu user id
-                var user = db.Users.FirstOrDefault(x => x.UserName == username);
-                int userId = user.Id;
+                var user1 = db.Users.FirstOrDefault(x => x.UserName == username);
+                int userId = user1.Id;
 
                 // ustawienie orderDTO i zapis 
                 oredrDTO.UserId = userId;
@@ -226,14 +226,30 @@ namespace CmsShop.Controllers
                     db.SaveChanges();
                 }
             }
+            UserDTO user;
+            using (Db db = new Db())
+            {
 
-            // wysylanie emaila do admina
-            var client = new SmtpClient("smtp.mailtrap.io", 2525)
+               user = db.Users.Where(x => x.UserName == User.Identity.Name).FirstOrDefault();
+
+            }
+
+                // wysylanie emaila do admina
+                var client = new SmtpClient("smtp.mailtrap.io", 2525)
             {
                 Credentials = new NetworkCredential("af6b8e39b53e5a", "04bc816627feb2"),
                 EnableSsl = true
             };
-            client.Send("admin@example.com", "admin@example.com", "Nowe zamowienie", "Masz nowe zamowienie. Numer zamówienia " + orderId);
+            client.Send("SklepUTP@example.com", "admin@example.com", "Nowe zamowienie nr:" + orderId, "Dziękujemy za dokonanie zakupu w naszej platformie \n Zamówienie nr : "+ orderId + " czeka na zrealizowanie " + orderId);
+
+
+            var client1 = new SmtpClient("smtp.mailtrap.io", 2525)
+            {
+                Credentials = new NetworkCredential("af6b8e39b53e5a", "04bc816627feb2"),
+                EnableSsl = true
+            };
+            client1.Send("SklepUTP@example.com",user.EmailAddress, "Nowe zamowienie nr:"+orderId, "Dziękujemy za dokonanie zakupu w naszej platformie \n Zamówienie nr : " + orderId + " czeka na zrealizowanie " + orderId);
+
 
             // reset session
             Session["cart"] = null;

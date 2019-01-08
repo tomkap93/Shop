@@ -26,22 +26,32 @@ namespace CmsShop
             {
                 return;
             }
-            // pobieramy nazwe użytkownika
-            string userName = Context.User.Identity.Name;
-            // deklarujemy tablice z rolami
-            string[] roles = null;
-            using (Db db = new Db())
+            else
             {
-                //pobieramy dane dla użytkownika z bazy aby pobrać role
-                UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == userName);
-                roles = db.UserRoles.Where(x => x.UserId == dto.Id).Select(x=>x.Role.Name).ToArray();
+                // pobieramy nazwe użytkownika
+                string userName = Context.User.Identity.Name;
+                // deklarujemy tablice z rolami
+                RoleDTO[] role = null;
+                string[] roles = null;
+                using (Db db = new Db())
+                {
+                    //pobieramy dane dla użytkownika z bazy aby pobrać role
+                    UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == userName);
+                    if (dto!=null)
+                    {
+                        roles = db.UserRoles.Where(x => x.UserId == dto.Id).Select(x => x.Role.Name).ToArray();
+                    }
+                    //   role=db.UserRoles.Where(x => x.UserId == dto.Id).Select(x => new RoleDTO() { }).ToArray();
+                  
 
+                }
+                // tworzymmy IPrincipal object
+                IIdentity userIdentity = new GenericIdentity(userName);
+                IPrincipal newUserObj = new GenericPrincipal(userIdentity, roles);
+                // updata context.user
+                Context.User = newUserObj;
             }
-            // tworzymmy IPrincipal object
-            IIdentity userIdentity = new GenericIdentity(userName);
-            IPrincipal newUserObj = new GenericPrincipal(userIdentity,roles);
-            // updata context.user
-            Context.User = newUserObj;
+         
 
         }
 

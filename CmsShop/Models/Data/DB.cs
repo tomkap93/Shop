@@ -21,5 +21,7 @@ namespace CmsShop.Models.Data
         public DbSet<OrderDTO> Orders { get; set; }
 
         public DbSet<OrderDetailsDTO> OrderDetails { get; set; }
+
+        public DbSet<ReviewDTO> Reviews { get; set; }
     }
 }

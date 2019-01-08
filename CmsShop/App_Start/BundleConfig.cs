@@ -29,6 +29,22 @@ namespace CmsShop
             bundles.Add(new ScriptBundle("~/bundles/scripts").Include(
                        "~/Scripts/jquery-{version}.js",
                        "~/Scripts/bootstrap.js"));
+
+            bundles.Add(new ScriptBundle("~/admin-lte/js").Include(
+                    "~/admin-lte/js/adminlte.js",
+                    "~/admin-lte/plugins/fastclick/fastclick.js",
+                    "~/admin-lte/plugins/datatables/jquery.dataTables.js",
+                    "~/admin-lte/plugins/datatables/dataTables.bootstrap.js",
+                    "~/admin-lte/plugins/chartjs/Chart.js"));
+
+            bundles.Add(new StyleBundle("~/Content/css").Include(
+                      "~/Content/bootstrap.css",
+                      "~/Content/site.css",
+                      "~/Content/font-awesome.css",
+                      "~/Content/ionicons.css",
+                      "~/admin-lte/css/AdminLTE.css",
+                      "~/admin-lte/css/skins/skin-blue.css",
+                      "~/admin-lte/plugins/datatables/dataTables.bootstrap.css"));
         }
     }
 }

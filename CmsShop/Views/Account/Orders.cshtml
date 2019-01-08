@@ -29,6 +29,9 @@ else
             <th>
                 Wartość
             </th>
+            <th>
+                Plik PDF
+            </th>
         </tr>
 
         @foreach (var item in Model)
@@ -36,12 +39,13 @@ else
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.OrderNumber)
+               
                 </td>
                 <td>
-                      @foreach (var item2 in item.ProductsAndQty)
-                      {
-                          @item2.Key @:x @item2.Value <br/>
-                      }
+                    @foreach (var item2 in item.ProductsAndQty)
+                    {
+                        @item2.Key @:x @item2.Value <br />
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CreatedAt)
@@ -49,8 +53,16 @@ else
                 <td>
                     @Html.DisplayFor(modelItem => item.Total)
                 </td>
+                <td>
+                  
+                  @Html.ActionLink("Pobierz", "Drukuj", new { orderid = item.OrderNumber })
+                </td>
+
             </tr>
         }
 
     </table>
 }
+
+
+

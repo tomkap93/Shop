@@ -51,12 +51,30 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13\lib\itextsharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MigraDoc.DocumentObjectModel, Version=1.32.4334.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\MigraDoc.DocumentObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Rendering, Version=1.32.4334.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\MigraDoc.Rendering.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.RtfRendering, Version=1.32.4334.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\MigraDoc.RtfRendering.dll</HintPath>
+    </Reference>
     <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
     </Reference>
     <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.32.3057.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.32.3057.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\PdfSharp.Charting.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -143,6 +161,7 @@
     <Compile Include="Areas\Admin\Controllers\PagesController.cs" />
     <Compile Include="Areas\Admin\Controllers\ShopController.cs" />
     <Compile Include="Areas\Admin\Models\ViewModels\Shop\OrdersForAdminVM.cs" />
+    <Compile Include="Class\CreatePDF.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CartController.cs" />
     <Compile Include="Controllers\PagesController.cs" />
@@ -156,6 +175,7 @@
     <Compile Include="Models\Data\OrderDTO.cs" />
     <Compile Include="Models\Data\PageDTO.cs" />
     <Compile Include="Models\Data\ProductDTO.cs" />
+    <Compile Include="Models\Data\ReviewDTO.cs" />
     <Compile Include="Models\Data\RoleDTO.cs" />
     <Compile Include="Models\Data\SidebarDTO.cs" />
     <Compile Include="Models\Data\UserDTO.cs" />
@@ -171,9 +191,88 @@
     <Compile Include="Models\ViewModels\Shop\CategoryVM.cs" />
     <Compile Include="Models\ViewModels\Shop\OrderVM.cs" />
     <Compile Include="Models\ViewModels\Shop\ProductVM.cs" />
+    <Compile Include="Models\ViewModels\Shop\ReviewVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="admin-lte\css\AdminLTE.css" />
+    <Content Include="admin-lte\css\AdminLTE.min.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-bootstrap-social.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-bootstrap-social.min.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-fullcalendar.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-fullcalendar.min.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-select2.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-select2.min.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-without-plugins.css" />
+    <Content Include="admin-lte\css\alt\AdminLTE-without-plugins.min.css" />
+    <Content Include="admin-lte\css\skins\skin-black-light.css" />
+    <Content Include="admin-lte\css\skins\skin-black-light.min.css" />
+    <Content Include="admin-lte\css\skins\skin-black.css" />
+    <Content Include="admin-lte\css\skins\skin-black.min.css" />
+    <Content Include="admin-lte\css\skins\skin-blue-light.css" />
+    <Content Include="admin-lte\css\skins\skin-blue-light.min.css" />
+    <Content Include="admin-lte\css\skins\skin-blue.css" />
+    <Content Include="admin-lte\css\skins\skin-blue.min.css" />
+    <Content Include="admin-lte\css\skins\skin-green-light.css" />
+    <Content Include="admin-lte\css\skins\skin-green-light.min.css" />
+    <Content Include="admin-lte\css\skins\skin-green.css" />
+    <Content Include="admin-lte\css\skins\skin-green.min.css" />
+    <Content Include="admin-lte\css\skins\skin-purple-light.css" />
+    <Content Include="admin-lte\css\skins\skin-purple-light.min.css" />
+    <Content Include="admin-lte\css\skins\skin-purple.css" />
+    <Content Include="admin-lte\css\skins\skin-purple.min.css" />
+    <Content Include="admin-lte\css\skins\skin-red-light.css" />
+    <Content Include="admin-lte\css\skins\skin-red-light.min.css" />
+    <Content Include="admin-lte\css\skins\skin-red.css" />
+    <Content Include="admin-lte\css\skins\skin-red.min.css" />
+    <Content Include="admin-lte\css\skins\skin-yellow-light.css" />
+    <Content Include="admin-lte\css\skins\skin-yellow-light.min.css" />
+    <Content Include="admin-lte\css\skins\skin-yellow.css" />
+    <Content Include="admin-lte\css\skins\skin-yellow.min.css" />
+    <Content Include="admin-lte\css\skins\_all-skins.css" />
+    <Content Include="admin-lte\css\skins\_all-skins.min.css" />
+    <Content Include="admin-lte\img\avatar.png" />
+    <Content Include="admin-lte\img\avatar04.png" />
+    <Content Include="admin-lte\img\avatar2.png" />
+    <Content Include="admin-lte\img\avatar3.png" />
+    <Content Include="admin-lte\img\avatar5.png" />
+    <Content Include="admin-lte\img\boxed-bg.jpg" />
+    <Content Include="admin-lte\img\boxed-bg.png" />
+    <Content Include="admin-lte\img\credit\american-express.png" />
+    <Content Include="admin-lte\img\credit\cirrus.png" />
+    <Content Include="admin-lte\img\credit\mastercard.png" />
+    <Content Include="admin-lte\img\credit\mestro.png" />
+    <Content Include="admin-lte\img\credit\paypal.png" />
+    <Content Include="admin-lte\img\credit\paypal2.png" />
+    <Content Include="admin-lte\img\credit\visa.png" />
+    <Content Include="admin-lte\img\default-50x50.gif" />
+    <Content Include="admin-lte\img\icons.png" />
+    <Content Include="admin-lte\img\photo1.png" />
+    <Content Include="admin-lte\img\photo2.png" />
+    <Content Include="admin-lte\img\photo3.jpg" />
+    <Content Include="admin-lte\img\photo4.jpg" />
+    <Content Include="admin-lte\img\user1-128x128.jpg" />
+    <Content Include="admin-lte\img\user2-160x160.jpg" />
+    <Content Include="admin-lte\img\user3-128x128.jpg" />
+    <Content Include="admin-lte\img\user4-128x128.jpg" />
+    <Content Include="admin-lte\img\user5-128x128.jpg" />
+    <Content Include="admin-lte\img\user6-128x128.jpg" />
+    <Content Include="admin-lte\img\user7-128x128.jpg" />
+    <Content Include="admin-lte\img\user8-128x128.jpg" />
+    <Content Include="admin-lte\js\adminlte.js" />
+    <Content Include="admin-lte\js\adminlte.min.js" />
+    <Content Include="admin-lte\js\demo.js" />
+    <Content Include="admin-lte\js\pages\dashboard.js" />
+    <Content Include="admin-lte\js\pages\dashboard2.js" />
+    <Content Include="admin-lte\plugins\chartjs\Chart.js" />
+    <Content Include="admin-lte\plugins\chartjs\Chart.min.js" />
+    <Content Include="admin-lte\plugins\datatables\dataTables.bootstrap.css" />
+    <Content Include="admin-lte\plugins\datatables\dataTables.bootstrap.js" />
+    <Content Include="admin-lte\plugins\datatables\dataTables.bootstrap.min.css" />
+    <Content Include="admin-lte\plugins\datatables\dataTables.bootstrap.min.js" />
+    <Content Include="admin-lte\plugins\datatables\jquery.dataTables.js" />
+    <Content Include="admin-lte\plugins\datatables\jquery.dataTables.min.js" />
+    <Content Include="admin-lte\plugins\fastclick\fastclick.js" />
     <Content Include="App_Data\CmsShop.mdf" />
     <Content Include="App_Data\CmsShop_log.ldf">
       <DependentUpon>CmsShop.mdf</DependentUpon>
@@ -189,11 +288,21 @@
     <Content Include="Content\fancybox\fancybox_overlay.png" />
     <Content Include="Content\fancybox\fancybox_sprite%402x.png" />
     <Content Include="Content\fancybox\fancybox_sprite.png" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\img\ajax-loader.gif" />
     <Content Include="Content\jquery.fancybox-buttons.css" />
     <Content Include="Content\jquery.fancybox-thumbs.css" />
     <Content Include="Content\jquery.fancybox.css" />
     <Content Include="Content\PagedList.css" />
+    <Content Include="Content\tether\tether-theme-arrows-dark.css" />
+    <Content Include="Content\tether\tether-theme-arrows-dark.min.css" />
+    <Content Include="Content\tether\tether-theme-arrows.css" />
+    <Content Include="Content\tether\tether-theme-arrows.min.css" />
+    <Content Include="Content\tether\tether-theme-basic.css" />
+    <Content Include="Content\tether\tether-theme-basic.min.css" />
+    <Content Include="Content\tether\tether.css" />
+    <Content Include="Content\tether\tether.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fileman\css\images\animated-overlay.gif" />
     <Content Include="fileman\css\images\ui-bg_flat_0_aaaaaa_40x100.png" />
@@ -475,13 +584,14 @@
     <Content Include="fileman\Uploads\LICENSE.txt" />
     <Content Include="fileman\Uploads\roxy-fileman-logo.gif" />
     <Content Include="fileman\Uploads\smiley 200x200.jpg" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Areas\Admin\Views\web.config" />
-    <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\_Layoutold.cshtml" />
     <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Admin\Views\Dashboard\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Pages\Index.cshtml" />
@@ -519,6 +629,15 @@
     <Content Include="Areas\Admin\Views\Shop\Products.cshtml" />
     <Content Include="Areas\Admin\Views\Shop\EditProduct.cshtml" />
     <Content Include="Areas\Admin\Views\Shop\Orders.cshtml" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="admin-lte\css\adminlte.min.css.map" />
+    <Content Include="admin-lte\css\adminlte.css.map" />
+    <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
+    <None Include="Properties\PublishProfiles\sklep2019utp - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\ckeditor\ckeditor.php" />
     <Content Include="Scripts\ckeditor\ckeditor_basic.js" />
@@ -887,6 +1006,8 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\tether.js" />
+    <Content Include="Scripts\tether.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -897,7 +1018,7 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_Layoutold.cshtml" />
     <Content Include="Views\Pages\Index.cshtml" />
     <Content Include="Views\Pages\PagesMenuPartial.cshtml" />
     <Content Include="Views\Pages\SidebarPartial.cshtml" />
@@ -913,6 +1034,11 @@
     <Content Include="Views\Account\UserProfile.cshtml" />
     <Content Include="Views\Cart\PayPalPartial.cshtml" />
     <Content Include="Views\Account\Orders.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Account\UserNavPartial2.cshtml" />
+    <Content Include="Views\Account\UserNavPartial3.cshtml" />
+    <Content Include="Views\Shop\Review.cshtml" />
+    <Content Include="Views\Shop\ReviewCreate.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

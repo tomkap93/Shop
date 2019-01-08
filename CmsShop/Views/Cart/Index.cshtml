@@ -13,11 +13,11 @@
 else
 {
 
-<div class="ajaxbg">
-    <span>       
-        <img src="~/Content/img/ajax-loader.gif" />
-    </span>
-</div>
+    <div class="ajaxbg">
+        <span>
+            <img src="~/Content/img/ajax-loader.gif" />
+        </span>
+    </div>
 
     <table class="table">
         <tr>
@@ -105,10 +105,73 @@ else
 
 
     <a href="#" class="placeorder btn btn-primary pull-right">Zapłać</a>
+    <div id = "paypal-button-container" ></div>
 }
 
 @section scripts{
+    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
     <script>
+
+
+        // Render the PayPal button
+        paypal.Button.render({
+            // Set your environment
+            env: 'sandbox', // sandbox | production
+
+            // Specify the style of the button
+            style: {
+                layout: 'vertical',  // horizontal | vertical
+                size: 'medium',    // medium | large | responsive
+                shape: 'rect',      // pill | rect
+                color: 'gold'       // gold | blue | silver | white | black
+            },
+
+            // Specify allowed and disallowed funding sources
+            //
+            // Options:
+            // - paypal.FUNDING.CARD
+            // - paypal.FUNDING.CREDIT
+            // - paypal.FUNDING.ELV
+            funding: {
+                allowed: [
+                    paypal.FUNDING.CARD,
+                    paypal.FUNDING.CREDIT
+                ],
+                disallowed: []
+            },
+
+            // Enable Pay Now checkout flow (optional)
+            commit: true,
+
+            // PayPal Client IDs - replace with your own
+            // Create a PayPal app: https://developer.paypal.com/developer/applications/create
+            client: {
+                sandbox: 'AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R',
+                production: '<insert production client id>'
+            },
+
+            payment: function (data, actions) {
+                return actions.payment.create({
+                    payment: {
+                        transactions: [
+                            {
+                                amount: {
+                                    total: '0.01',
+                                    currency: 'PLN'
+                                }
+                            }
+                        ]
+                    }
+                });
+            },
+
+            onAuthorize: function (data, actions) {
+                return actions.payment.execute()
+                    .then(function () {
+                        window.alert('Payment Complete!');
+                    });
+            }
+        }, '#paypal-button-container');
 
         ///inkrementacja produktu
         $(function () {
@@ -129,12 +192,12 @@ else
                     $("td.grandtotal span").text(grandtotal);
                 }).done(function (date) {
                     var url2 = "/cart/PayPalPartial";
-                    $.get(url2, { }, function (data) {
+                    $.get(url2, {}, function (data) {
 
                         $('div.paypaldiv').html(data);
 
                     });
-                    });
+                });
             });
             /////////////////////////////////
 
@@ -195,29 +258,29 @@ else
 
                 });
             });
-            
-        ///Składanie zamowienia
 
-        $("a.placeorder").click(function (e) {
+            ///Składanie zamowienia
 
-            e.preventDefault();
-            var $this = $(this);
-            var productId = $(this).data("id");
-            var url = "/cart/PlaceOrder";
-            $(".ajaxbg").show();
+            $("a.placeorder").click(function (e) {
 
-            $.post(url, { }, function (data) {
+                e.preventDefault();
+                var $this = $(this);
+                var productId = $(this).data("id");
+                var url = "/cart/PlaceOrder";
+                $(".ajaxbg").show();
 
-                $(".ajaxbg").text("Dziekuję. Zostaniesz teraz przekierowany do systemu PayPal");
-                setTimeout(function () {
+                $.post(url, {}, function (data) {
 
-                    $('form input[name="submit"]').click();
+                    $(".ajaxbg").text("Dziekuję. Zostaniesz teraz przekierowany do systemu PayPal");
+                    setTimeout(function () {
 
-                }, 2000);
+                        $('form input[name="submit"]').click();
+
+                    }, 2000);
 
 
+                });
             });
-        });
             ///////////////////////////////////
         });
     </script>
