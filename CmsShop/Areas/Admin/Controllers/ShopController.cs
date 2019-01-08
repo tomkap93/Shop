@@ -572,7 +572,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
             }
 
-            return View();
+            return View(ordersForAdminVM);
         }
 
     }
