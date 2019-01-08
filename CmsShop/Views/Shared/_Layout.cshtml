@@ -54,7 +54,9 @@
                     }
                 </ul>
 
-                @if (Request.IsAuthenticated && User.IsInRole("Admin")) // sprawdzanie roli użytkownika  odnośnik w globl
+                @if (Request.IsAuthenticated)
+                {         
+                if (User.IsInRole("Admin")) // sprawdzanie roli użytkownika  odnośnik w globl
                 {
                     <ul class="navbar-collapse collapse navbar-right adminarea">
 
@@ -71,7 +73,7 @@
                         </ul>
                     }
                 }
-
+                }
 
             </div>
         </div>
